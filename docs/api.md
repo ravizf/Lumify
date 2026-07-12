@@ -1,9 +1,10 @@
-# API
+# API Documentation
 
-Base URL in local development:
+Base URLs in local development:
 
 ```text
-http://localhost:4000
+Core API: http://localhost:4000
+Agent Engine: http://localhost:8000
 ```
 
 ## Health
@@ -31,7 +32,7 @@ Response: `202 Accepted`
 {
   "resumeId": "generated-id",
   "status": "queued",
-  "next": "MS2 Resume Analyzer will extract skills and competency evidence."
+  "next": "Agent Engine Resume Analyzer will extract skills and competency evidence."
 }
 ```
 
@@ -50,9 +51,7 @@ Response: `202 Accepted`
 
 Response: `201 Created`
 
-## Agent Service
-
-`GET /health`
+## Agent Engine
 
 `POST /agents/resume-analyzer`
 
@@ -62,3 +61,8 @@ Response: `201 Created`
   "target_role": "Backend Developer"
 }
 ```
+
+Milestone 1 keeps endpoints intentionally minimal. The API contract is designed
+so later milestones can add company selection, target role parsing,
+multimodal attempts, feedback reports, roadmap tasks, and calendar scheduling
+without changing the repository boundaries.

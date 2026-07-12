@@ -1,34 +1,59 @@
 # Architecture
 
-InterviewDNA is designed as a small production monorepo with a separated
-frontend, core business API, and AI agent service.
+InterviewDNA is a production-style monorepo with a React frontend, an Express
+Core API, a FastAPI Agent Engine, Redis for fast coordination, and PostgreSQL
+with pgvector for relational and retrieval storage.
 
 ```mermaid
 flowchart TD
-  A[React Frontend] -->|HTTPS / REST API| B[NGINX Gateway]
-  B --> C[MS1 Core API<br/>Express]
-  B --> D[MS2 AI Agent<br/>FastAPI]
-  D --> E[LangGraph]
-  E --> F[Gemini API]
-  C --> G[PostgreSQL + Prisma]
-  G --> H[pgvector]
+  A[React Frontend] -->|HTTPS| B[NGINX Gateway]
+  B --> C[Core API<br/>Express]
+  C --> D[Redis<br/>sessions, rate limits, queues, AI cache]
+  D --> E[Agent Engine<br/>FastAPI]
+  E --> F[LangGraph]
+  F --> G[Gemini API]
+  C --> H[PostgreSQL + Prisma]
+  H --> I[pgvector]
+  E --> H
 ```
 
 ## Service Responsibilities
 
 | Service | Responsibility |
 | --- | --- |
-| Frontend | Candidate experience, resume upload, assessment UI, dashboard, analytics |
-| MS1 Core API | Authentication, users, resumes, assessments, attempts, schedules, persistence |
-| MS2 AI Agent | Planner graph, resume analysis, competency extraction, roadmap generation, hints, interview evaluation |
-| NGINX Gateway | TLS termination, routing, service isolation, rate-limit boundary |
-| PostgreSQL + pgvector | Relational system of record plus vector retrieval for RAG |
+| Frontend | Candidate journey, resume upload, company selection, interview flow, roadmap, progress dashboard |
+| Core API | Auth, users, resumes, roles, assessments, attempts, roadmaps, calendars, notifications, persistence |
+| Redis | Session cache, rate limiting, async job queue, AI-response cache, interview state handoff |
+| Agent Engine | Multi-agent orchestration, LangGraph nodes, memory updates, question planning, evaluation, roadmap generation |
+| NGINX Gateway | TLS termination, routing, reverse proxy, service isolation |
+| PostgreSQL + pgvector | System of record plus vector search over resume evidence, feedback, and learning resources |
 
-## Multi-Agent Flow
+## Deployment Story
 
-Planner Agent -> Resume Analyzer -> Competency Agent -> Assessment Agent ->
-Roadmap Generator -> Hint Generator -> Interview Evaluator.
+```mermaid
+flowchart TD
+  A[Frontend] --> B[Vercel]
+  B --> C[NGINX Gateway]
+  C --> D[Render: Core API]
+  D --> E[Redis]
+  D --> F[Render: Agent Engine]
+  F --> G[Gemini API]
+  D --> H[Managed PostgreSQL]
+  H --> I[pgvector]
+```
 
-The Planner chooses which specialist agent runs next. The Core API stores
-canonical data, while the Agent service performs reasoning and returns
-structured outputs that MS1 can validate and persist.
+## Adaptive Intelligence Loop
+
+InterviewDNA does not stop after a report. Each session updates
+`InterviewDnaMemory`, which helps the next interview become more targeted and
+appropriately difficult.
+
+```text
+Upload Resume + Target JD
+-> Competency Intelligence Engine
+-> Adaptive Interview Planner
+-> Multimodal Evaluation Engine
+-> InterviewDNA Memory Update
+-> Personalized Learning Roadmap
+-> Calendar + Next Practice
+```
