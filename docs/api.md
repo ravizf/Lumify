@@ -66,3 +66,31 @@ Milestone 1 keeps endpoints intentionally minimal. The API contract is designed
 so later milestones can add company selection, target role parsing,
 multimodal attempts, feedback reports, roadmap tasks, and calendar scheduling
 without changing the repository boundaries.
+
+## Demo Interview Report
+
+`POST /api/demo/interview-report`
+
+```json
+{
+  "user": {
+    "name": "Ravi",
+    "email": "ravi@example.com"
+  },
+  "resumeName": "resume.pdf",
+  "jobDescription": "Backend role requiring APIs, SQL, auth, Redis, and communication.",
+  "saveInterviewDna": true,
+  "answers": [
+    {
+      "question": "Explain your backend experience.",
+      "text": "I built APIs with auth and SQL.",
+      "audioRef": "answer.webm",
+      "videoRef": "answer.mp4"
+    }
+  ]
+}
+```
+
+Returns an `Interview Intelligence Report` with scores, strengths, gaps,
+InterviewDNA MVP memory status, roadmap tasks, and a suggested practice
+schedule.

@@ -46,6 +46,43 @@ that starts from zero every time.
 - Personalized learning roadmap and roadmap tasks
 - Calendar events and notifications
 
+## MVP Scope
+
+### Layer 1: Demoable Core Workflow
+
+These are the features the MVP is designed to demo confidently:
+
+```text
+User Login
+-> Upload Resume PDF
+-> Paste Job Description
+-> Resume Parser
+-> Competency Intelligence Engine
+-> Gap Analysis
+-> Adaptive Interview Planner
+-> AI Interview
+-> Text + Audio + Video Analysis
+-> Multimodal Evaluation Engine
+-> Interview Intelligence Report
+```
+
+### Layer 2: Simplified MVP
+
+- InterviewDNA MVP memory stores the current interview summary for demo reuse.
+- Learning Roadmap generates Week 1, Week 2, and Week 3 practice tasks.
+- Calendar produces a suggested practice schedule: Monday, Wednesday, Saturday.
+
+### Layer 3: Planned Production Features
+
+- Redis-backed queues and AI response caching
+- Full adaptive memory across repeated interviews
+- Continuous InterviewDNA evolution
+- Calendar integration
+- Notifications
+- Advanced analytics
+- Team dashboard
+- Recruiter portal
+
 ## Architecture
 
 ```mermaid
@@ -96,21 +133,21 @@ flowchart TD
 
 ```text
 Planner Agent
-  -> Resume Parser Agent
-  -> JD Parser Agent
+  -> Resume Parser
+  -> JD Parser
+  -> User Context
   -> Competency Intelligence Engine
-  -> Gap Analysis Agent
-  -> Adaptive Interview Planner Agent
+  -> Gap Analysis Engine
+  -> Adaptive Interview Planner
   -> Question Generator Agent
-  -> NLP Analyzer
+  -> Live Interview Session
+  -> Text Analyzer
   -> Speech Analyzer
   -> Video Analyzer
   -> Multimodal Evaluation Engine
-  -> Feedback and Scoring Agent
+  -> InterviewDNA MVP Memory
   -> Learning Planner
-  -> Calendar Scheduler
-  -> Progress Tracker
-  -> Report Synthesizer Agent
+  -> Interview Intelligence Report
 ```
 
 This design demonstrates planning, coordination, memory, learning, and
@@ -159,6 +196,12 @@ Planned and partially scaffolded controls:
 - Redis-backed rate limiting
 - Input validation before persistence
 - Environment-based secrets
+
+## Privacy
+
+InterviewDNA is privacy-first. Users explicitly opt in to save InterviewDNA
+memory for personalized coaching. If they do not opt in, interview data is
+processed temporarily and discarded after report generation.
 
 ## Deployment
 

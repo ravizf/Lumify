@@ -42,6 +42,13 @@ dashboards.
    - Interview Intelligence Report updates memory and progress
    - Shows next practice plan, readiness score, and calendar action
 
+## MVP Layering
+
+Layer 1 screens support the complete demo flow from login through report.
+Layer 2 screens show simplified InterviewDNA memory, learning roadmap, and
+suggested schedule. Layer 3 production features are documented in architecture
+and roadmap notes instead of being presented as fully implemented UI.
+
 ## Design Tokens
 
 | Token | Value |

@@ -60,3 +60,14 @@ FRONTEND_ORIGIN=
 4. Build Docker images.
 5. Deploy frontend to Vercel.
 6. Deploy APIs to Render.
+
+## Planned Production Features
+
+- Redis-backed queues and AI response cache
+- Full adaptive memory across repeated interviews
+- Continuous InterviewDNA evolution
+- Calendar provider integration
+- Notifications
+- Advanced analytics
+- Team dashboard
+- Recruiter portal

@@ -23,3 +23,10 @@ Security is intentionally represented in the repository from Milestone 1 so the
 system can grow without reworking its boundaries later. The Core API remains the
 trusted persistence boundary; the Agent Engine returns structured outputs that
 the Core API validates before writing to PostgreSQL.
+
+## Privacy Model
+
+Users explicitly opt in to save InterviewDNA memory for personalized coaching.
+If a user does not opt in, interview answers, audio references, and video
+references are processed temporarily and discarded after the Interview
+Intelligence Report is generated.

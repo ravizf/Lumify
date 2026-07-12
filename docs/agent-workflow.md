@@ -3,7 +3,7 @@
 InterviewDNA uses an adaptive multi-agent design. The agents are not just
 calling an LLM; they coordinate, evaluate, remember, and adapt future sessions.
 
-## Production-Level Agent Flow
+## MVP Agent Flow
 
 ```mermaid
 flowchart TD
@@ -14,26 +14,33 @@ flowchart TD
   C --> F[Competency Intelligence Engine]
   D --> F
   E --> F
-  F --> G[Gap Analysis Agent]
-  G --> H[Adaptive Interview Planner Agent]
+  F --> G[Gap Analysis Engine]
+  G --> H[Adaptive Interview Planner]
   H --> I[Question Generator Agent]
   I --> J[Interview Session]
   J --> K[Text Answer]
   J --> L[Audio Answer]
   J --> M[Video Answer]
-  K --> N[NLP Analyzer]
+  K --> N[Text Analyzer]
   L --> O[Speech Analyzer]
   M --> P[Video Analyzer]
   N --> Q[Multimodal Evaluation Engine]
   O --> Q
   P --> Q
   Q --> R[Feedback and Scoring Agent]
-  R --> S[InterviewDNA Memory]
+  R --> S[InterviewDNA MVP Memory]
   R --> T[Learning Planner]
   S --> U[Report Synthesizer Agent]
   T --> U
   U --> V[Dashboard + Calendar + Next Steps]
 ```
+
+## MVP Memory
+
+The MVP does not claim full continuous adaptation. It stores the current
+interview summary as InterviewDNA MVP memory so future interviews can use it.
+The production version will continuously update InterviewDNA after every
+interview and increase difficulty based on stored patterns.
 
 ## LangGraph Flow
 
@@ -61,10 +68,10 @@ flowchart TD
 | Resume Parser Agent | Extracts skills, projects, and evidence from resumes |
 | JD Parser Agent | Converts target job descriptions into expectations |
 | Competency Intelligence Engine | Maps resume evidence against target role needs |
-| Gap Analysis Agent | Finds missing competencies and weak evidence |
-| Adaptive Interview Planner Agent | Chooses question strategy based on memory and gaps |
+| Gap Analysis Engine | Finds missing competencies and weak evidence |
+| Adaptive Interview Planner | Chooses question strategy based on memory and gaps |
 | Question Generator Agent | Generates role-specific questions |
-| NLP Analyzer | Evaluates text answers |
+| Text Analyzer | Evaluates text answers |
 | Speech Analyzer | Evaluates audio delivery signals |
 | Video Analyzer | Evaluates video presence signals |
 | Multimodal Evaluation Engine | Combines text, speech, and video signals |
@@ -85,5 +92,6 @@ Interview 1
 -> Interview 3 adapts further
 ```
 
-The memory loop is the product's key differentiator: every session makes the
+The memory loop is the product's key differentiator. In the MVP, the current
+session summary is stored for demo reuse. In production, every session makes the
 candidate profile smarter.
