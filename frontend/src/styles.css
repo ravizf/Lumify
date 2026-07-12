@@ -1,0 +1,148 @@
+:root {
+  color: #eef4ff;
+  background: #0c1018;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+button {
+  border: 0;
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+  background: #57d6a3;
+  color: #07110d;
+  font-weight: 700;
+}
+
+button.secondary {
+  background: #202838;
+  color: #eef4ff;
+  border: 1px solid #354158;
+}
+
+.app-shell {
+  min-height: 100vh;
+  padding: 56px;
+  background:
+    radial-gradient(circle at 82% 16%, rgba(87, 214, 163, 0.18), transparent 32%),
+    linear-gradient(135deg, #0c1018 0%, #111827 52%, #161922 100%);
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 48px;
+  align-items: center;
+  min-height: 58vh;
+}
+
+.eyebrow {
+  color: #57d6a3;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(3rem, 7vw, 6rem);
+  line-height: 0.95;
+}
+
+.hero-copy > p:last-of-type {
+  max-width: 660px;
+  color: #c8d2e2;
+  font-size: 1.15rem;
+  line-height: 1.7;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 28px;
+}
+
+.signal-panel,
+.workflow article {
+  border: 1px solid #293244;
+  border-radius: 8px;
+  background: rgba(18, 24, 35, 0.86);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.25);
+}
+
+.signal-panel {
+  padding: 28px;
+}
+
+.signal-panel span,
+.signal-panel small {
+  display: block;
+  color: #aab8cc;
+}
+
+.signal-panel strong {
+  display: block;
+  margin: 10px 0 18px;
+  font-size: 4.5rem;
+}
+
+.meter {
+  height: 12px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #263044;
+  margin-bottom: 18px;
+}
+
+.meter i {
+  display: block;
+  width: 82%;
+  height: 100%;
+  background: linear-gradient(90deg, #57d6a3, #79b8ff);
+}
+
+.workflow {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.workflow article {
+  padding: 22px;
+}
+
+.workflow svg {
+  color: #79b8ff;
+}
+
+.workflow h2 {
+  font-size: 1rem;
+  margin: 18px 0 8px;
+}
+
+.workflow p {
+  margin: 0;
+  color: #aab8cc;
+  line-height: 1.55;
+}
+
+@media (max-width: 900px) {
+  .app-shell {
+    padding: 28px;
+  }
+
+  .hero,
+  .workflow {
+    grid-template-columns: 1fr;
+  }
+}
