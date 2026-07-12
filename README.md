@@ -1,162 +1,292 @@
-# InterviewDNA
+# 🚀 Lumify
 
-InterviewDNA is an adaptive AI interview coach. It analyzes a candidate's
-resume and target job description, builds an InterviewDNA memory profile,
-generates targeted interviews, evaluates multimodal answers, and turns every
-session into a smarter next practice plan.
+> ### AI-Powered Interview Intelligence Platform
+> **Powered by the InterviewDNA™ Engine**
 
-## Problem Statement
+Lumify is an AI-powered interview intelligence platform that helps candidates prepare for technical and behavioral interviews using Resume Intelligence, Competency Mapping, AI Mock Interviews, and Multimodal Evaluation.
 
-Interview preparation is usually generic. Candidates practice random questions
-without knowing which competencies are weak, which resume claims need stronger
-evidence, or how their previous interview performance should change the next
-session.
+Unlike traditional interview preparation platforms that analyze only textual responses, Lumify evaluates **what you say** and **how you say it** by combining resume understanding, speech analysis, and video-based behavioral analysis into one intelligent coaching experience.
 
-## Solution
+At the core of Lumify is the **InterviewDNA™ Engine**, an adaptive intelligence profile that captures interview performance, competency gaps, and personalized learning insights to continuously improve future interview sessions.
 
-InterviewDNA creates a feedback loop:
+---
+
+# 📌 Problem Statement
+
+Interview preparation today is mostly generic.
+
+Candidates often:
+
+- Practice random interview questions
+- Don't know which skills are weak
+- Receive no structured competency feedback
+- Get evaluated only on answers, not communication
+- Have no personalized improvement roadmap
+
+---
+
+# 💡 Solution
+
+Lumify provides an AI-powered interview coaching workflow.
 
 ```text
-Upload Resume + Target JD
--> Resume Parsing and Skill Extraction
--> Competency Intelligence Engine
--> Adaptive Interview Planner
--> AI Mock Interview
--> Multimodal Evaluation Engine
--> InterviewDNA Memory Update
--> Personalized Learning Roadmap
--> Calendar and Next Practice
+Resume Upload
+      │
+      ▼
+Resume Parser
+      │
+      ▼
+Job Description Analysis
+      │
+      ▼
+Competency Intelligence Engine
+      │
+      ▼
+Gap Analysis Engine
+      │
+      ▼
+Adaptive Interview Planner
+      │
+      ▼
+AI Mock Interview
+      │
+      ▼
+Text Analysis
+Speech Analysis
+Video Analysis
+      │
+      ▼
+Multimodal Evaluation Engine
+      │
+      ▼
+InterviewDNA™ Engine
+      │
+      ▼
+Interview Intelligence Report
+      │
+      ▼
+Personalized Learning Roadmap
 ```
 
-The system behaves like a coach that remembers progress instead of a chatbot
-that starts from zero every time.
+Lumify behaves like a real interview coach that understands candidate strengths, communication patterns, and improvement opportunities instead of acting as a simple chatbot.
 
-## Features
+---
 
-- Resume upload and skill extraction
-- Target company and job description matching
-- Competency mapping and gap analysis
-- Adaptive interview planning
-- Question generation for target roles
-- Text, audio, and video answer references
-- NLP, speech, and video analysis pipeline design
-- Multimodal evaluation and scoring
-- InterviewDNA memory profile
+# ✨ Key Features
+
+## Resume Intelligence
+
+- PDF Resume Upload
+- Resume Parsing
+- Skill Extraction
+- Resume Evidence Mapping
+
+## Job Intelligence
+
+- Job Description Analysis
+- Company Requirement Extraction
+- Competency Mapping
+- Skill Gap Analysis
+
+## AI Interview
+
+- Adaptive Interview Planning
+- AI Question Generation
+- Technical Interviews
+- Behavioral Interviews
+
+## Multimodal Evaluation
+
+- Text Analysis
+- Speech Analysis
+- Video Behavioral Analysis
+- Confidence Detection
+- Eye Contact Analysis
+- Communication Scoring
+- Posture & Engagement Analysis
+
+## AI Coaching
+
+- InterviewDNA™ Engine
 - Interview Intelligence Report
-- Personalized learning roadmap and roadmap tasks
-- Calendar events and notifications
+- Personalized Learning Roadmap
+- Suggested Practice Schedule
 
-## MVP Scope
+---
 
-### Layer 1: Demoable Core Workflow
+# 🎯 MVP Scope
 
-These are the features the MVP is designed to demo confidently:
+## ✅ Layer 1 — Fully Working Demo
+
+The following features will be fully implemented and demonstrated:
 
 ```text
-User Login
--> Upload Resume PDF
--> Paste Job Description
--> Resume Parser
--> Competency Intelligence Engine
--> Gap Analysis
--> Adaptive Interview Planner
--> AI Interview
--> Text + Audio + Video Analysis
--> Multimodal Evaluation Engine
--> Interview Intelligence Report
+User Authentication
+        │
+        ▼
+Resume Upload
+        │
+        ▼
+Job Description Input
+        │
+        ▼
+Resume Parser
+        │
+        ▼
+Competency Intelligence Engine
+        │
+        ▼
+Gap Analysis
+        │
+        ▼
+Adaptive Interview Planner
+        │
+        ▼
+AI Interview
+        │
+        ▼
+Text + Speech + Video Analysis
+        │
+        ▼
+Multimodal Evaluation Engine
+        │
+        ▼
+Interview Intelligence Report
 ```
 
-### Layer 2: Simplified MVP
+---
 
-- InterviewDNA MVP memory stores the current interview summary for demo reuse.
-- Learning Roadmap generates Week 1, Week 2, and Week 3 practice tasks.
-- Calendar produces a suggested practice schedule: Monday, Wednesday, Saturday.
+## 🟡 Layer 2 — Simplified MVP
 
-### Layer 3: Planned Production Features
+These features exist with limited implementation.
 
-- Redis-backed queues and AI response caching
-- Full adaptive memory across repeated interviews
-- Continuous InterviewDNA evolution
-- Calendar integration
+- InterviewDNA™ Memory
+- Personalized Learning Roadmap
+- Suggested Weekly Practice Schedule
+
+---
+
+## 🔵 Layer 3 — Production Roadmap
+
+Future production features include:
+
+- Continuous InterviewDNA Evolution
+- Redis-backed AI Queues
+- AI Response Caching
+- Calendar Integration
 - Notifications
-- Advanced analytics
-- Team dashboard
-- Recruiter portal
+- Recruiter Dashboard
+- Mentor Dashboard
+- Team Analytics
+- Enterprise Version
 
-## Architecture
+---
 
-```mermaid
-flowchart TD
-  A[React Frontend] -->|HTTPS| B[NGINX Gateway]
-  B --> C[Core API<br/>Express]
-  C --> D[Redis<br/>sessions, queues, rate limits, AI cache]
-  D --> E[Agent Engine<br/>FastAPI]
-  E --> F[LangGraph]
-  F --> G[Gemini API]
-  C --> H[PostgreSQL + Prisma]
-  H --> I[pgvector]
-  E --> H
-```
-
-## Technology Stack
-
-| Layer | Technology |
-| --- | --- |
-| Frontend | React, Vite, CSS, lucide-react |
-| Core API | Node.js, Express, Zod, Helmet, CORS |
-| Agent Engine | Python, FastAPI, LangGraph, Gemini API |
-| Database | PostgreSQL, Prisma, pgvector |
-| Cache and queues | Redis |
-| Gateway | NGINX |
-| DevOps | Docker Compose, GitHub Actions |
-| Design | Figma wireframes |
-
-## AI Workflow
+# 🏗️ High-Level Architecture
 
 ```mermaid
 flowchart TD
-  A[START] --> B[Load Candidate]
-  B --> C[Resume Analysis]
-  C --> D[Competency Mapping]
-  D --> E{Need More Context?}
-  E -->|Yes| F[Ask User]
-  E -->|No| G[Generate Questions]
-  F --> G
-  G --> H[Conduct Interview]
-  H --> I[Evaluate Answers]
-  I --> J[Update Memory]
-  J --> K[Generate Roadmap]
-  K --> L[END]
+
+A[React Frontend]
+
+A --> B[Camera & Microphone]
+
+A --> C[NGINX API Gateway]
+
+C --> D[Core API - Express]
+
+D --> E[Redis]
+
+E --> F[Agent Engine - FastAPI]
+
+F --> G[LangGraph]
+
+G --> H[Gemini API]
+
+B --> I[MediaPipe]
+
+I --> F
+
+F --> J[PostgreSQL]
+
+J --> K[Prisma ORM]
+
+J --> L[pgvector]
 ```
 
-## Multi-Agent Design
+---
+
+# 🤖 AI Workflow
 
 ```text
 Planner Agent
-  -> Resume Parser
-  -> JD Parser
-  -> User Context
-  -> Competency Intelligence Engine
-  -> Gap Analysis Engine
-  -> Adaptive Interview Planner
-  -> Question Generator Agent
-  -> Live Interview Session
-  -> Text Analyzer
-  -> Speech Analyzer
-  -> Video Analyzer
-  -> Multimodal Evaluation Engine
-  -> InterviewDNA MVP Memory
-  -> Learning Planner
-  -> Interview Intelligence Report
+        │
+        ▼
+Resume Parser Agent
+        │
+JD Parser Agent
+        │
+User Context
+        │
+        ▼
+Competency Intelligence Engine
+        │
+        ▼
+Gap Analysis Engine
+        │
+        ▼
+Adaptive Interview Planner
+        │
+        ▼
+Question Generator Agent
+        │
+        ▼
+Live Interview Session
+        │
+ ┌───────────────┬────────────────┬────────────────┐
+ ▼               ▼                ▼
+Text Analyzer  Speech Analyzer  Video Analyzer
+        │
+        └───────────────┬────────────────┘
+                        ▼
+        Multimodal Evaluation Engine
+                        │
+                        ▼
+            InterviewDNA™ Engine
+                        │
+        ┌───────────────┴────────────────┐
+        ▼                                ▼
+Learning Roadmap         Interview Intelligence Report
 ```
 
-This design demonstrates planning, coordination, memory, learning, and
-adaptation. Each interview updates the InterviewDNA memory profile, making the
-next interview more targeted.
+---
 
-## Database Design
+# 🧠 Multi-Agent Architecture
 
-Core entities:
+Lumify uses multiple specialized AI agents.
+
+- Planner Agent
+- Resume Parser Agent
+- Job Description Parser Agent
+- Competency Intelligence Engine
+- Gap Analysis Engine
+- Adaptive Interview Planner
+- Question Generator Agent
+- Speech Analysis Agent
+- Video Analysis Agent
+- Text Analysis Agent
+- Multimodal Evaluation Engine
+- InterviewDNA™ Engine
+- Learning Planner Agent
+- Interview Intelligence Report Generator
+
+Each agent performs a single responsibility, making the system modular, scalable, and production-ready.
+
+---
+
+# 🗄️ Database Design
+
+Core Entities
 
 - User
 - Resume
@@ -168,101 +298,80 @@ Core entities:
 - Assessment
 - Question
 - QuestionAttempt
-- Hint
 - InterviewSession
 - InterviewFeedback
-- InterviewDnaMemory
+- InterviewDNAMemory
 - LearningRoadmap
 - RoadmapTask
 - CalendarEvent
 - Notification
 
-The Prisma schema is located at `core-api/prisma/schema.prisma`.
+Database: **PostgreSQL + Prisma + pgvector**
 
-## API Documentation
+---
 
-Milestone 1 includes health, resume, and assessment API skeletons. Full API
-details are documented in `docs/api.md`.
+# 🔒 Security
 
-## Security
+- JWT Authentication
+- bcrypt Password Hashing
+- Helmet Security
+- Zod Validation
+- CORS Protection
+- Redis Rate Limiting
+- Secure Environment Variables
+- Input Sanitization
 
-Planned and partially scaffolded controls:
+---
 
-- JWT authentication
-- bcrypt password hashing
-- Zod request validation
-- Helmet HTTP hardening
-- CORS allowlist through `FRONTEND_ORIGIN`
-- Redis-backed rate limiting
-- Input validation before persistence
-- Environment-based secrets
+# 🔐 Privacy
 
-## Privacy
+Lumify follows a **privacy-first** design.
 
-InterviewDNA is privacy-first. Users explicitly opt in to save InterviewDNA
-memory for personalized coaching. If they do not opt in, interview data is
-processed temporarily and discarded after report generation.
+Users explicitly opt in before InterviewDNA™ stores interview summaries for personalized coaching.
 
-## Deployment
+Without consent, interview data is processed temporarily and discarded after report generation.
+
+---
+
+# 🚀 Tech Stack
+
+| Layer | Technology |
+|---------|------------|
+| Frontend | React + Vite |
+| Styling | CSS / Tailwind CSS |
+| Core API | Node.js + Express |
+| AI Engine | FastAPI + LangGraph |
+| LLM | Gemini API |
+| Database | PostgreSQL |
+| ORM | Prisma |
+| Vector DB | pgvector |
+| Cache | Redis |
+| Gateway | NGINX |
+| Deployment | Docker, Render, Vercel |
+
+---
+
+# 📂 Folder Structure
 
 ```text
-Frontend
-  -> Vercel
-  -> NGINX Gateway
-  -> Render Core API
-  -> Redis
-  -> Render Agent Engine
-  -> Gemini API
-  -> Managed PostgreSQL
-  -> pgvector
+lumify/
+
+├── frontend/
+├── core-api/
+├── agent-engine/
+├── shared/
+├── docs/
+├── infra/
+├── docker-compose.yml
+├── README.md
+└── .gitignore
 ```
 
-## Folder Structure
+---
 
-```text
-interviewdna/
-|-- frontend/
-|-- core-api/
-|   |-- prisma/
-|   `-- src/
-|       |-- config/
-|       |-- controllers/
-|       |-- middleware/
-|       |-- repositories/
-|       |-- routes/
-|       |-- services/
-|       |-- validators/
-|       |-- sockets/
-|       |-- utils/
-|       `-- server.js
-|-- agent-engine/
-|   |-- agents/
-|   |-- graphs/
-|   |-- nodes/
-|   |-- state/
-|   |-- prompts/
-|   |-- tools/
-|   |-- rag/
-|   |-- embeddings/
-|   |-- memory/
-|   |-- utils/
-|   `-- main.py
-|-- shared/
-|   |-- schemas/
-|   `-- constants/
-|-- infra/
-|   |-- docker/
-|   |-- nginx/
-|   `-- github-actions/
-|-- docs/
-|-- README.md
-|-- docker-compose.yml
-`-- .gitignore
-```
+# ⚙️ Installation
 
-## Installation
-
-### Frontend
+## Frontend
 
 ```bash
 cd frontend
@@ -270,7 +379,7 @@ npm install
 npm run dev
 ```
 
-### Core API
+## Core API
 
 ```bash
 cd core-api
@@ -279,7 +388,7 @@ npx prisma generate
 npm run dev
 ```
 
-### Agent Engine
+## Agent Engine
 
 ```bash
 cd agent-engine
@@ -287,30 +396,60 @@ pip install -r requirements.txt
 uvicorn main:app --reload
 ```
 
-### Docker Compose
+## Docker
 
 ```bash
 docker compose up --build
 ```
 
-## Documentation
+---
 
-- [Architecture](docs/architecture.md)
-- [API Documentation](docs/api.md)
-- [Database Design](docs/database.md)
-- [Agent Workflow](docs/agent-workflow.md)
-- [Wireframes](docs/wireframes.md)
-- [Deployment](docs/deployment.md)
-- [Security](docs/security.md)
+# 📚 Documentation
 
-## Future Scope
+- Architecture
+- API Documentation
+- Database Design
+- Agent Workflow
+- Wireframes
+- Deployment
+- Security
 
-- Full JWT authentication and RBAC
-- Resume PDF parsing pipeline
-- LangGraph implementation for all workflow nodes
-- pgvector-backed retrieval over resume evidence and interview memory
-- Redis queues for long-running AI jobs
-- Audio and video analysis integrations
-- Calendar provider integration
-- Mentor dashboard
-- Production CI/CD and observability
+---
+
+# 🌍 Production Roadmap
+
+- Resume RAG using pgvector
+- Advanced LangGraph Workflows
+- Real-time Speech Analysis
+- MediaPipe Behavioral Analysis
+- Adaptive InterviewDNA Evolution
+- Recruiter Dashboard
+- Mentor Dashboard
+- Enterprise Analytics
+- CI/CD Pipeline
+- Cloud Monitoring
+
+---
+
+# ⭐ Why Lumify?
+
+Traditional interview platforms evaluate only **answers**.
+
+Lumify evaluates:
+
+- Resume Quality
+- Job Fit
+- Competency Gaps
+- Technical Knowledge
+- Communication Skills
+- Speech Delivery
+- Video-Based Behavioral Signals
+- Personalized Improvement Roadmaps
+
+By combining these signals, Lumify provides a complete interview intelligence experience rather than a simple question-answer chatbot.
+
+---
+
+## 👨‍💻 Built for
+
+Hackathons • AI Engineering • Software Engineering • Agentic AI • Career Intelligence • Interview Preparation
