@@ -4,10 +4,10 @@ import { BrainCircuit, FileText, LineChart, Route } from "lucide-react";
 import "./styles.css";
 
 const stages = [
-  { icon: FileText, title: "Resume Upload", text: "Parse resumes into verified skills and evidence." },
-  { icon: BrainCircuit, title: "Adaptive Assessment", text: "Generate role-aware questions from competency gaps." },
-  { icon: Route, title: "Learning Roadmap", text: "Turn weak signals into a weekly preparation plan." },
-  { icon: LineChart, title: "Analytics", text: "Track readiness across competencies and interview sessions." }
+  { icon: FileText, title: "Resume + Target JD", text: "Extract skills and compare them against a real company role." },
+  { icon: BrainCircuit, title: "Adaptive Planner", text: "Choose interview questions from gaps and previous memory." },
+  { icon: Route, title: "Learning Roadmap", text: "Turn weak competencies into scheduled weekly practice." },
+  { icon: LineChart, title: "Progress Memory", text: "Update InterviewDNA after every mock interview." }
 ];
 
 function App() {
@@ -18,8 +18,9 @@ function App() {
           <p className="eyebrow">AI interview preparation platform</p>
           <h1>InterviewDNA</h1>
           <p>
-            A multi-agent system that analyzes a candidate's resume, measures
-            competency gaps, and creates a personalized interview practice loop.
+            An adaptive multi-agent coach that studies your resume and target
+            job description, runs smarter mock interviews, and remembers every
+            session to improve the next one.
           </p>
           <div className="hero-actions">
             <button>Start Assessment</button>
@@ -30,7 +31,7 @@ function App() {
           <span>Readiness Score</span>
           <strong>82%</strong>
           <div className="meter"><i /></div>
-          <small>Backend • DSA • Communication • System Design</small>
+          <small>Technical depth / Communication / Confidence / Role fit</small>
         </div>
       </section>
       <section className="workflow">

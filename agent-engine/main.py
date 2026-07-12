@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 
-app = FastAPI(title="InterviewDNA MS2 AI Agent")
+app = FastAPI(title="InterviewDNA Agent Engine")
 
 
 class ResumeAnalysisRequest(BaseModel):
@@ -11,7 +11,7 @@ class ResumeAnalysisRequest(BaseModel):
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "service": "ms2-agent-service"}
+    return {"status": "ok", "service": "agent-engine"}
 
 
 @app.post("/agents/resume-analyzer")

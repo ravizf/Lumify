@@ -5,6 +5,6 @@ export async function createAssessmentPlan(payload) {
     assessmentId: randomUUID(),
     status: "draft",
     questionTarget: payload.questionTarget ?? 10,
-    agent: "assessment-agent"
+    agent: "adaptive-interview-planner"
   };
 }
