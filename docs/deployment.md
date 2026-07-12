@@ -6,8 +6,8 @@ Run services individually during development:
 
 ```bash
 cd frontend && npm install && npm run dev
-cd ms1-core-api && npm install && npm run dev
-cd ms2-agent-service && pip install -r requirements.txt && uvicorn main:app --reload
+cd core-api && npm install && npm run dev
+cd agent-engine && pip install -r requirements.txt && uvicorn main:app --reload
 ```
 
 Or run the Docker skeleton:
@@ -16,12 +16,47 @@ Or run the Docker skeleton:
 docker compose up --build
 ```
 
-## Production Direction
+## Production Story
 
-1. Build the React app and serve it behind NGINX.
-2. Route `/api/*` to MS1 Core API.
-3. Route `/agents/*` to MS2 AI Agent.
-4. Use managed PostgreSQL with pgvector enabled.
-5. Store resume files in object storage.
-6. Use GitHub Actions for lint, test, build, and image publishing.
-7. Configure secrets for database URL, Gemini API key, JWT signing key, and file storage.
+```text
+Frontend
+  -> Vercel
+  -> NGINX Gateway
+  -> Render Core API
+  -> Redis
+  -> Render Agent Engine
+  -> Gemini API
+  -> Managed PostgreSQL
+  -> pgvector
+```
+
+## Deployment Responsibilities
+
+| Layer | Deployment Target |
+| --- | --- |
+| Frontend | Vercel static deployment |
+| Gateway | NGINX reverse proxy |
+| Core API | Render web service |
+| Agent Engine | Render web service or worker |
+| Redis | Managed Redis or Render Redis |
+| Database | Managed PostgreSQL with pgvector |
+| AI Provider | Gemini API |
+
+## Environment Variables
+
+```text
+DATABASE_URL=
+REDIS_URL=
+GEMINI_API_KEY=
+JWT_SECRET=
+FRONTEND_ORIGIN=
+```
+
+## Future CI/CD
+
+1. Run frontend build.
+2. Run Core API tests and Prisma validation.
+3. Run Agent Engine tests.
+4. Build Docker images.
+5. Deploy frontend to Vercel.
+6. Deploy APIs to Render.
