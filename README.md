@@ -1,455 +1,553 @@
-# 🚀 Lumify
+# Lumify
 
-> ### AI-Powered Interview Intelligence Platform
-> **Powered by the InterviewDNA™ Engine**
+AI Interview Intelligence Platform for resume-based interview preparation.
 
-Lumify is an AI-powered interview intelligence platform that helps candidates prepare for technical and behavioral interviews using Resume Intelligence, Competency Mapping, AI Mock Interviews, and Multimodal Evaluation.
+Lumify helps candidates upload a resume, paste a target job description, receive a skill gap analysis, generate personalized interview questions, answer those questions, and review an interview intelligence report.
 
-Unlike traditional interview preparation platforms that analyze only textual responses, Lumify evaluates **what you say** and **how you say it** by combining resume understanding, speech analysis, and video-based behavioral analysis into one intelligent coaching experience.
+This repository is currently focused on **Milestone 2**: authentication, frontend-backend communication, resume upload, protected interview analysis, and a working LangGraph agent workflow through the Agent Engine.
 
-At the core of Lumify is the **InterviewDNA™ Engine**, an adaptive intelligence profile that captures interview performance, competency gaps, and personalized learning insights to continuously improve future interview sessions.
+## Milestone 2 Status
 
----
+Completed for Milestone 2:
 
-# 📌 Problem Statement
+- React + Vite frontend demo flow
+- Express.js Core API
+- JWT authentication with bcrypt password hashing
+- Protected profile and interview routes
+- PDF resume upload using `multer` and `pdf-parse`
+- Resume text extraction and preview
+- Job description input
+- Protected `/api/interview/analyze` endpoint
+- Core API to Agent Engine communication
+- FastAPI Agent Engine
+- LangGraph workflow for interview analysis
+- Gemini-compatible Agent Engine integration with deterministic fallback
+- Interview session start endpoint
+- Answer evaluation endpoint
+- Interview history endpoint
+- Final report UI with match score, strengths, gaps, feedback, and learning recommendations
 
-Interview preparation today is mostly generic.
+Not included in Milestone 2:
 
-Candidates often:
-
-- Practice random interview questions
-- Don't know which skills are weak
-- Receive no structured competency feedback
-- Get evaluated only on answers, not communication
-- Have no personalized improvement roadmap
-
----
-
-# 💡 Solution
-
-Lumify provides an AI-powered interview coaching workflow.
-
-```text
-Resume Upload
-      │
-      ▼
-Resume Parser
-      │
-      ▼
-Job Description Analysis
-      │
-      ▼
-Competency Intelligence Engine
-      │
-      ▼
-Gap Analysis Engine
-      │
-      ▼
-Adaptive Interview Planner
-      │
-      ▼
-AI Mock Interview
-      │
-      ▼
-Text Analysis
-Speech Analysis
-Video Analysis
-      │
-      ▼
-Multimodal Evaluation Engine
-      │
-      ▼
-InterviewDNA™ Engine
-      │
-      ▼
-Interview Intelligence Report
-      │
-      ▼
-Personalized Learning Roadmap
-```
-
-Lumify behaves like a real interview coach that understands candidate strengths, communication patterns, and improvement opportunities instead of acting as a simple chatbot.
-
----
-
-# ✨ Key Features
-
-## Resume Intelligence
-
-- PDF Resume Upload
-- Resume Parsing
-- Skill Extraction
-- Resume Evidence Mapping
-
-## Job Intelligence
-
-- Job Description Analysis
-- Company Requirement Extraction
-- Competency Mapping
-- Skill Gap Analysis
-
-## AI Interview
-
-- Adaptive Interview Planning
-- AI Question Generation
-- Technical Interviews
-- Behavioral Interviews
-
-## Multimodal Evaluation
-
-- Text Analysis
-- Speech Analysis
-- Video Behavioral Analysis
-- Confidence Detection
-- Eye Contact Analysis
-- Communication Scoring
-- Posture & Engagement Analysis
-
-## AI Coaching
-
-- InterviewDNA™ Engine
-- Interview Intelligence Report
-- Personalized Learning Roadmap
-- Suggested Practice Schedule
-
----
-
-# 🎯 MVP Scope
-
-## ✅ Layer 1 — Fully Working Demo
-
-The following features will be fully implemented and demonstrated:
-
-```text
-User Authentication
-        │
-        ▼
-Resume Upload
-        │
-        ▼
-Job Description Input
-        │
-        ▼
-Resume Parser
-        │
-        ▼
-Competency Intelligence Engine
-        │
-        ▼
-Gap Analysis
-        │
-        ▼
-Adaptive Interview Planner
-        │
-        ▼
-AI Interview
-        │
-        ▼
-Text + Speech + Video Analysis
-        │
-        ▼
-Multimodal Evaluation Engine
-        │
-        ▼
-Interview Intelligence Report
-```
-
----
-
-## 🟡 Layer 2 — Simplified MVP
-
-These features exist with limited implementation.
-
-- InterviewDNA™ Memory
-- Personalized Learning Roadmap
-- Suggested Weekly Practice Schedule
-
----
-
-## 🔵 Layer 3 — Production Roadmap
-
-Future production features include:
-
-- Continuous InterviewDNA Evolution
-- Redis-backed AI Queues
-- AI Response Caching
-- Calendar Integration
+- Video analysis
+- Speech analysis
+- MediaPipe
+- Redis queues
+- pgvector RAG
+- Calendar integration
 - Notifications
-- Recruiter Dashboard
-- Mentor Dashboard
-- Team Analytics
-- Enterprise Version
+- Recruiter dashboard
+- Enterprise features
 
----
-
-# 🏗️ High-Level Architecture
-
-```mermaid
-flowchart TD
-
-A[React Frontend]
-
-A --> B[Camera & Microphone]
-
-A --> C[NGINX API Gateway]
-
-C --> D[Core API - Express]
-
-D --> E[Redis]
-
-E --> F[Agent Engine - FastAPI]
-
-F --> G[LangGraph]
-
-G --> H[Gemini API]
-
-B --> I[MediaPipe]
-
-I --> F
-
-F --> J[PostgreSQL]
-
-J --> K[Prisma ORM]
-
-J --> L[pgvector]
-```
-
----
-
-# 🤖 AI Workflow
+## Architecture
 
 ```text
-Planner Agent
-        │
-        ▼
-Resume Parser Agent
-        │
-JD Parser Agent
-        │
-User Context
-        │
-        ▼
-Competency Intelligence Engine
-        │
-        ▼
-Gap Analysis Engine
-        │
-        ▼
-Adaptive Interview Planner
-        │
-        ▼
-Question Generator Agent
-        │
-        ▼
-Live Interview Session
-        │
- ┌───────────────┬────────────────┬────────────────┐
- ▼               ▼                ▼
-Text Analyzer  Speech Analyzer  Video Analyzer
-        │
-        └───────────────┬────────────────┘
-                        ▼
-        Multimodal Evaluation Engine
-                        │
-                        ▼
-            InterviewDNA™ Engine
-                        │
-        ┌───────────────┴────────────────┐
-        ▼                                ▼
-Learning Roadmap         Interview Intelligence Report
+Frontend (React + Vite)
+        |
+        v
+Core API (Express.js)
+        |
+        v
+Agent Engine (FastAPI + LangGraph)
+        |
+        v
+Gemini API
+        |
+        v
+Core API
+        |
+        v
+Frontend
 ```
 
----
+The Core API owns authentication, resume upload, session state, and frontend-facing endpoints. The Agent Engine owns the AI workflow and can use Gemini when a Gemini API key is configured. If the Agent Engine or Gemini key is unavailable during a demo, Lumify falls back to deterministic local analysis so the hackathon flow remains reliable.
 
-# 🧠 Multi-Agent Architecture
+## LangGraph Workflow
 
-Lumify uses multiple specialized AI agents.
-
-- Planner Agent
-- Resume Parser Agent
-- Job Description Parser Agent
-- Competency Intelligence Engine
-- Gap Analysis Engine
-- Adaptive Interview Planner
-- Question Generator Agent
-- Speech Analysis Agent
-- Video Analysis Agent
-- Text Analysis Agent
-- Multimodal Evaluation Engine
-- InterviewDNA™ Engine
-- Learning Planner Agent
-- Interview Intelligence Report Generator
-
-Each agent performs a single responsibility, making the system modular, scalable, and production-ready.
-
----
-
-# 🗄️ Database Design
-
-Core Entities
-
-- User
-- Resume
-- TargetCompany
-- TargetRole
-- Skill
-- Competency
-- CompetencyScore
-- Assessment
-- Question
-- QuestionAttempt
-- InterviewSession
-- InterviewFeedback
-- InterviewDNAMemory
-- LearningRoadmap
-- RoadmapTask
-- CalendarEvent
-- Notification
-
-Database: **PostgreSQL + Prisma + pgvector**
-
----
-
-# 🔒 Security
-
-- JWT Authentication
-- bcrypt Password Hashing
-- Helmet Security
-- Zod Validation
-- CORS Protection
-- Redis Rate Limiting
-- Secure Environment Variables
-- Input Sanitization
-
----
-
-# 🔐 Privacy
-
-Lumify follows a **privacy-first** design.
-
-Users explicitly opt in before InterviewDNA™ stores interview summaries for personalized coaching.
-
-Without consent, interview data is processed temporarily and discarded after report generation.
-
----
-
-# 🚀 Tech Stack
-
-| Layer | Technology |
-|---------|------------|
-| Frontend | React + Vite |
-| Styling | CSS / Tailwind CSS |
-| Core API | Node.js + Express |
-| AI Engine | FastAPI + LangGraph |
-| LLM | Gemini API |
-| Database | PostgreSQL |
-| ORM | Prisma |
-| Vector DB | pgvector |
-| Cache | Redis |
-| Gateway | NGINX |
-| Deployment | Docker, Render, Vercel |
-
----
-
-# 📂 Folder Structure
+Milestone 2 uses the following Agent Engine workflow:
 
 ```text
-lumify/
-
-├── frontend/
-├── core-api/
-├── agent-engine/
-├── shared/
-├── docs/
-├── infra/
-├── docker-compose.yml
-├── README.md
-└── .gitignore
+Resume Parser
+      |
+      v
+JD Parser
+      |
+      v
+Skill Extraction
+      |
+      v
+Gap Analysis
+      |
+      v
+Question Generator
 ```
 
----
+The workflow returns structured JSON:
 
-# ⚙️ Installation
+```json
+{
+  "graph": "InterviewAnalysisGraph",
+  "poweredBy": "gemini",
+  "matchScore": 86,
+  "strengths": ["react", "node", "express"],
+  "missingSkills": ["docker", "redis"],
+  "recommendations": [
+    "Learn docker and prepare one resume-backed story."
+  ],
+  "questions": [
+    {
+      "question": "Explain docker using a project from your resume.",
+      "topic": "docker"
+    }
+  ]
+}
+```
 
-## Frontend
+## Authentication Flow
+
+Lumify uses JWT authentication for protected API access.
+
+1. User registers with name, email, and password.
+2. Core API hashes the password using bcrypt.
+3. Core API returns a JWT.
+4. Frontend stores the JWT for the current demo session.
+5. Protected requests include:
+
+```http
+Authorization: Bearer <token>
+```
+
+Protected routes verify the JWT before allowing resume, interview, profile, or agent workflow requests.
+
+## API Endpoints
+
+Base URL:
+
+```text
+http://localhost:4000
+```
+
+### Health
+
+#### `GET /health`
+
+Returns Core API health status.
+
+```json
+{
+  "status": "ok",
+  "service": "core-api"
+}
+```
+
+### Authentication
+
+#### `POST /auth/signup`
+
+Creates a user account and returns a JWT.
+
+Request:
+
+```json
+{
+  "name": "Demo User",
+  "email": "demo@example.com",
+  "password": "secret123"
+}
+```
+
+Response:
+
+```json
+{
+  "token": "jwt-token",
+  "user": {
+    "id": "user-id",
+    "name": "Demo User",
+    "email": "demo@example.com"
+  }
+}
+```
+
+Alias: `POST /api/auth/signup`
+
+#### `POST /auth/login`
+
+Logs in an existing user and returns a JWT.
+
+Request:
+
+```json
+{
+  "email": "demo@example.com",
+  "password": "secret123"
+}
+```
+
+Alias: `POST /api/auth/login`
+
+#### `GET /auth/profile`
+
+Protected route. Returns the authenticated user profile.
+
+Aliases:
+
+```text
+GET /auth/me
+GET /api/auth/profile
+GET /api/auth/me
+```
+
+### Resume
+
+#### `POST /resume/upload`
+
+Protected route. Uploads a PDF resume, extracts text, saves it to the demo data store, and returns a preview.
+
+Request:
+
+```text
+Content-Type: multipart/form-data
+Field name: resume
+File type: PDF
+```
+
+Response:
+
+```json
+{
+  "resume": {
+    "id": "resume-id",
+    "userId": "user-id",
+    "resumeText": "...",
+    "fileName": "resume.pdf",
+    "createdAt": "2026-07-15T00:00:00.000Z"
+  },
+  "preview": "Extracted resume text preview...",
+  "extraction": {
+    "characters": 1200,
+    "status": "extracted"
+  }
+}
+```
+
+Aliases:
+
+```text
+POST /api/resume/upload
+POST /api/resumes/upload
+```
+
+### Interview
+
+#### `POST /api/interview/analyze`
+
+Protected route. This is the main Milestone 2 analysis endpoint.
+
+Flow:
+
+```text
+Frontend
+  -> Core API
+  -> Agent Engine
+  -> LangGraph workflow
+  -> Gemini API when configured
+  -> Core API
+  -> Frontend
+```
+
+Request:
+
+```json
+{
+  "resumeId": "resume-id",
+  "jobDescription": "We are hiring a full-stack developer with React, Node.js, Docker, Redis, and PostgreSQL experience..."
+}
+```
+
+Response:
+
+```json
+{
+  "sessionId": "session-id",
+  "graph": "InterviewAnalysisGraph",
+  "poweredBy": "gemini",
+  "agentFlow": [
+    "Resume Parser",
+    "JD Parser",
+    "Skill Extraction",
+    "Gap Analysis",
+    "Question Generator",
+    "Learning Planner"
+  ],
+  "matchScore": 86,
+  "strengths": ["react", "node", "express"],
+  "missingSkills": ["docker", "redis"],
+  "recommendations": [
+    "Learn docker and prepare one resume-backed story."
+  ],
+  "questions": [
+    {
+      "id": "question-id",
+      "question": "Explain docker using a project from your resume.",
+      "topic": "docker",
+      "difficulty": "easy"
+    }
+  ]
+}
+```
+
+Alias: `POST /interview/analyze`
+
+#### `POST /api/interview/start`
+
+Protected route. Starts an interview session and returns generated questions.
+
+Request:
+
+```json
+{
+  "sessionId": "session-id"
+}
+```
+
+#### `POST /api/interview/evaluate`
+
+Protected route. Evaluates a candidate answer.
+
+Request:
+
+```json
+{
+  "sessionId": "session-id",
+  "questionId": "question-id",
+  "candidateAnswer": "I used Docker to package the API and keep deployment consistent across environments."
+}
+```
+
+Response:
+
+```json
+{
+  "score": 82,
+  "feedback": "Strong answer...",
+  "idealAnswer": "A strong answer defines the topic, gives a resume-backed example, and explains one tradeoff.",
+  "confidence": 0.86
+}
+```
+
+#### `GET /api/interview/history`
+
+Protected route. Returns prior interview sessions for the authenticated user.
+
+### Agent Compatibility
+
+#### `POST /api/agent/run`
+
+Protected route added from the Milestone 2 zip as a compatibility endpoint. It runs a Core API LangGraph check and confirms the protected agent workflow path is working. The primary Milestone 2 analysis flow remains `/api/interview/analyze`.
+
+Request:
+
+```json
+{
+  "input": "React Node Express resume targeting Docker Redis JWT APIs"
+}
+```
+
+## Agent Engine Endpoints
+
+Base URL:
+
+```text
+http://localhost:8000
+```
+
+### `GET /health`
+
+Returns Agent Engine health, graph name, configured nodes, and whether Gemini credentials are configured.
+
+### `POST /agents/interview-analysis`
+
+Called by the Core API. Runs the LangGraph interview analysis workflow.
+
+Request:
+
+```json
+{
+  "resume_text": "Candidate resume text...",
+  "job_description": "Target job description..."
+}
+```
+
+## Setup
+
+### Prerequisites
+
+- Node.js 20+
+- Python 3.11+
+- PostgreSQL for Prisma-backed production persistence
+- Gemini API key for AI-powered Agent Engine responses
+
+Milestone 2 currently includes a demo in-memory store in the Core API so the hackathon flow can run immediately without requiring a database migration during presentation setup.
+
+### 1. Install Root Dependencies
+
+```bash
+npm install
+```
+
+### 2. Frontend Setup
 
 ```bash
 cd frontend
+cp .env.local.example .env.local
 npm install
 npm run dev
 ```
 
-## Core API
+Frontend URL:
+
+```text
+http://localhost:5173
+```
+
+### 3. Core API Setup
 
 ```bash
 cd core-api
+cp .env.example .env
 npm install
-npx prisma generate
 npm run dev
 ```
 
-## Agent Engine
+Core API URL:
+
+```text
+http://localhost:4000
+```
+
+Optional Prisma commands:
+
+```bash
+npx prisma generate
+npx prisma migrate dev
+```
+
+### 4. Agent Engine Setup
 
 ```bash
 cd agent-engine
+python -m venv .venv
+.venv\Scripts\activate
 pip install -r requirements.txt
-uvicorn main:app --reload
+uvicorn main:app --reload --port 8000
 ```
 
-## Docker
+Agent Engine URL:
+
+```text
+http://localhost:8000
+```
+
+### 5. Run Frontend and Core API from Root
+
+From the repository root:
 
 ```bash
-docker compose up --build
+npm run dev:api
+npm run dev:frontend
 ```
 
----
+Run the Agent Engine separately from `agent-engine/`.
 
-# 📚 Documentation
+## Environment Examples
 
-- Architecture
-- API Documentation
-- Database Design
-- Agent Workflow
-- Wireframes
-- Deployment
-- Security
+### `frontend/.env.local`
 
----
+```env
+VITE_API_URL=http://localhost:4000
+```
 
-# 🌍 Production Roadmap
+### `core-api/.env`
 
-- Resume RAG using pgvector
-- Advanced LangGraph Workflows
-- Real-time Speech Analysis
-- MediaPipe Behavioral Analysis
-- Adaptive InterviewDNA Evolution
-- Recruiter Dashboard
-- Mentor Dashboard
-- Enterprise Analytics
-- CI/CD Pipeline
-- Cloud Monitoring
+```env
+PORT=4000
+FRONTEND_ORIGIN=http://localhost:5173
+JWT_SECRET=replace-with-a-long-random-string
+DATABASE_URL=postgresql://user:password@localhost:5432/lumify?schema=public
+AGENT_ENGINE_URL=http://localhost:8000
+GEMINI_API_KEY=
+GEMINI_MODEL=gemini-1.5-flash
+```
 
----
+### `agent-engine/.env`
 
-# ⭐ Why Lumify?
+```env
+GEMINI_API_KEY=your-gemini-api-key
+GEMINI_MODEL=gemini-1.5-flash
+```
 
-Traditional interview platforms evaluate only **answers**.
+## Folder Structure
 
-Lumify evaluates:
+```text
+Lumify/
+  frontend/       React + Vite frontend
+  core-api/       Express.js API, auth, resume upload, interview routes
+  agent-engine/   FastAPI + LangGraph + Gemini-compatible agent service
+  shared/         Shared schemas/constants placeholders
+  docs/           Project documentation
+  infra/          Deployment and infrastructure files
+```
 
-- Resume Quality
-- Job Fit
-- Competency Gaps
-- Technical Knowledge
-- Communication Skills
-- Speech Delivery
-- Video-Based Behavioral Signals
-- Personalized Improvement Roadmaps
+## Tech Stack
 
-By combining these signals, Lumify provides a complete interview intelligence experience rather than a simple question-answer chatbot.
+| Layer | Technology |
+| --- | --- |
+| Frontend | React + Vite |
+| Styling | CSS, Tailwind-ready UI structure |
+| Core API | Express.js |
+| Authentication | JWT, bcrypt |
+| Validation | Zod, Pydantic |
+| Resume Upload | multer, pdf-parse |
+| Agent Engine | FastAPI, LangGraph |
+| LLM | Gemini API |
+| ORM | Prisma |
+| Database | PostgreSQL |
 
----
+## Demo Script
 
-## 👨‍💻 Built for
+1. Register or log in.
+2. Open the dashboard.
+3. Upload a PDF resume.
+4. Paste a target job description.
+5. Run resume analysis.
+6. Show the Agent Engine workflow and generated skill gap analysis.
+7. Start the AI interview.
+8. Answer one or more questions.
+9. Generate the Interview Intelligence Report.
+10. Show match score, strengths, missing skills, answer feedback, and learning recommendations.
 
-Hackathons • AI Engineering • Software Engineering • Agentic AI • Career Intelligence • Interview Preparation
+## Milestone 3 Roadmap
+
+Planned after Milestone 2:
+
+- Persist all auth, resume, interview, question, and roadmap data fully through PostgreSQL
+- Add production Prisma migrations and seed data
+- Add Gemini-powered answer evaluation in the Agent Engine
+- Add richer LangGraph state and conditional edges
+- Add speech analysis
+- Add video analysis
+- Add MediaPipe behavioral signals
+- Add Redis queues for longer-running AI jobs
+- Add pgvector-based resume and interview memory retrieval
+- Add recruiter and mentor dashboards
+- Add notifications and calendar integration
+- Add production deployment hardening
+
+## Repository
+
+GitHub: [https://github.com/ravizf/Lumify](https://github.com/ravizf/Lumify)
+
+## Built For
+
+Hackathons, AI engineering, agentic AI, software engineering interviews, and career intelligence.

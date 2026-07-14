@@ -1,6 +1,6 @@
 :root {
-  color: #eef4ff;
-  background: #0c1018;
+  color: #edf5ff;
+  background: #091016;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
@@ -45,6 +45,20 @@ button.secondary {
   border: 1px solid #354158;
 }
 
+.nav-button,
+.icon-button,
+.segmented button {
+  background: rgba(255, 255, 255, 0.05);
+  color: #edf5ff;
+  border: 1px solid #314157;
+}
+
+.icon-button {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+}
+
 input,
 textarea {
   width: 100%;
@@ -80,8 +94,7 @@ label {
   grid-template-columns: 280px minmax(0, 1fr);
   min-height: 100vh;
   background:
-    radial-gradient(circle at 80% 8%, rgba(87, 214, 163, 0.15), transparent 28%),
-    linear-gradient(135deg, #0c1018 0%, #111827 54%, #151923 100%);
+    linear-gradient(135deg, rgba(8, 16, 24, 0.98) 0%, rgba(17, 29, 43, 0.96) 50%, rgba(22, 24, 34, 0.98) 100%);
 }
 
 .sidebar {
@@ -181,15 +194,164 @@ label {
   padding: 42px;
 }
 
+.topbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+.topbar h1 {
+  margin: 0;
+  font-size: clamp(2.1rem, 4vw, 4.4rem);
+}
+
+.user-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 5px 6px 5px 14px;
+  border: 1px solid #314157;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  font-weight: 800;
+}
+
+.loading-strip,
+.error-strip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-weight: 800;
+}
+
+.loading-strip {
+  border: 1px solid rgba(87, 214, 163, 0.38);
+  background: rgba(87, 214, 163, 0.1);
+  color: #82e6bb;
+}
+
+.loading-strip svg {
+  animation: spin 0.9s linear infinite;
+}
+
+.error-strip {
+  border: 1px solid rgba(255, 126, 126, 0.42);
+  background: rgba(255, 126, 126, 0.1);
+  color: #ffb0b0;
+}
+
 .panel,
 .metric,
 .question-preview,
 .interview-card,
-.roadmap-item {
+.roadmap-item,
+.stat-card,
+.intro-panel {
   border: 1px solid #293244;
   border-radius: 8px;
-  background: rgba(18, 24, 35, 0.9);
+  background: rgba(18, 24, 35, 0.72);
+  backdrop-filter: blur(16px);
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.18);
+}
+
+.auth-layout,
+.dashboard {
+  display: grid;
+  gap: 18px;
+}
+
+.auth-layout {
+  grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.75fr);
+  align-items: stretch;
+}
+
+.intro-panel {
+  display: grid;
+  align-content: end;
+  min-height: 430px;
+  padding: 32px;
+  background:
+    linear-gradient(rgba(10, 18, 27, 0.15), rgba(10, 18, 27, 0.9)),
+    url("https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=1200&q=80") center/cover;
+}
+
+.intro-panel svg {
+  color: #57d6a3;
+}
+
+.intro-panel h2 {
+  max-width: 680px;
+  margin: 18px 0 12px;
+  font-size: clamp(2rem, 4vw, 4rem);
+}
+
+.intro-panel p {
+  max-width: 620px;
+  line-height: 1.7;
+}
+
+.auth-panel,
+.action-panel {
+  display: grid;
+  align-content: start;
+  gap: 18px;
+}
+
+.segmented {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 6px;
+  border: 1px solid #293244;
+  border-radius: 8px;
+  background: #0f1621;
+}
+
+.segmented .selected {
+  background: #57d6a3;
+  color: #07110d;
+  border-color: #57d6a3;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.stats-grid.compact {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-bottom: 22px;
+}
+
+.stat-card {
+  display: grid;
+  gap: 8px;
+  min-height: 132px;
+  padding: 18px;
+}
+
+.stat-card svg {
+  color: #79b8ff;
+}
+
+.stat-card span {
+  color: #aab8cc;
+  font-weight: 800;
+}
+
+.stat-card strong {
+  font-size: 1.5rem;
+}
+
+.action-panel {
+  margin-top: 18px;
 }
 
 .panel {
@@ -221,6 +383,10 @@ h1 {
   margin-bottom: 18px;
   font-size: clamp(2.8rem, 6vw, 5.5rem);
   line-height: 0.98;
+}
+
+.workspace > .topbar h1 {
+  line-height: 1.04;
 }
 
 h2 {
@@ -301,6 +467,19 @@ h3 {
   display: none;
 }
 
+.resume-preview {
+  max-height: 180px;
+  overflow: auto;
+  margin: 16px 0 0;
+  padding: 14px;
+  border: 1px solid #293244;
+  border-radius: 8px;
+  background: #0f1621;
+  color: #c9d7ea;
+  white-space: pre-wrap;
+  line-height: 1.5;
+}
+
 .chip-row,
 .warning-list,
 .media-row {
@@ -315,6 +494,62 @@ h3 {
   padding: 8px 12px;
   font-size: 0.85rem;
   font-weight: 800;
+}
+
+.flow-list {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.engine-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  margin-bottom: 16px;
+  padding: 7px 10px;
+  border: 1px solid rgba(87, 214, 163, 0.34);
+  border-radius: 8px;
+  background: rgba(87, 214, 163, 0.08);
+  color: #82e6bb;
+  font-weight: 800;
+}
+
+.flow-list span {
+  position: relative;
+  min-height: 38px;
+  padding: 9px 12px 9px 34px;
+  border: 1px solid #314157;
+  border-radius: 8px;
+  background: rgba(121, 184, 255, 0.08);
+  color: #dceaff;
+  font-weight: 800;
+}
+
+.flow-list span::before {
+  content: "";
+  position: absolute;
+  left: 14px;
+  top: 15px;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #79b8ff;
+}
+
+.score-ring {
+  display: grid;
+  place-items: center;
+  width: 150px;
+  height: 150px;
+  margin: 24px 0;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at center, #121823 58%, transparent 60%),
+    conic-gradient(#57d6a3 0 86%, #293244 86% 100%);
+  color: #edf5ff;
+  font-size: 2.4rem;
+  font-weight: 900;
 }
 
 .chip-row span {
@@ -356,6 +591,27 @@ h3 {
 .interview-card textarea {
   min-height: 120px;
   margin: 14px 0;
+}
+
+.feedback-box,
+.feedback-line {
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid rgba(87, 214, 163, 0.28);
+  border-radius: 8px;
+  background: rgba(87, 214, 163, 0.08);
+}
+
+.feedback-box strong {
+  display: block;
+  margin-bottom: 4px;
+  color: #82e6bb;
+  font-size: 1.35rem;
+}
+
+.feedback-box p,
+.feedback-line {
+  margin-bottom: 0;
 }
 
 .media-row label {
@@ -421,7 +677,10 @@ h3 {
   .grid-two,
   .report-grid,
   .metrics,
-  .auth-grid {
+  .auth-grid,
+  .auth-layout,
+  .stats-grid,
+  .stats-grid.compact {
     grid-template-columns: 1fr;
   }
 
@@ -431,5 +690,19 @@ h3 {
 
   .workspace {
     padding: 24px;
+  }
+
+  .topbar {
+    display: grid;
+  }
+
+  .intro-panel {
+    min-height: 360px;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
 }

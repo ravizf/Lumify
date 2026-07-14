@@ -2,309 +2,451 @@ import React, { useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
   BarChart3,
+  BookOpenCheck,
   BrainCircuit,
-  CalendarDays,
   CheckCircle2,
+  ClipboardList,
   FileText,
+  History,
+  Loader2,
   Lock,
-  Mic,
+  LogOut,
   Play,
+  ShieldCheck,
+  Sparkles,
   Upload,
-  UserRound,
-  Video
+  UserRound
 } from "lucide-react";
 import "./styles.css";
 
-const seedQuestions = [
-  "Explain how your resume project proves you can build reliable APIs for this role.",
-  "The JD mentions scalable backend systems. How would you add caching and rate limiting?",
-  "Describe a difficult technical tradeoff you made and how you communicated it.",
-  "How would you test an interview platform that accepts text, audio, and video answers?"
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
+
+const loadingStages = [
+  "Uploading resume...",
+  "Extracting skills...",
+  "Analyzing JD...",
+  "Running AI agents...",
+  "Generating questions..."
 ];
 
-const skillKeywords = [
-  "react",
-  "node",
-  "express",
-  "postgres",
-  "sql",
-  "prisma",
-  "python",
-  "fastapi",
-  "docker",
-  "redis",
-  "api",
-  "auth",
-  "testing"
+const fallbackQuestions = [
+  { id: "local-1", question: "Explain JWT authentication.", topic: "JWT", difficulty: "easy" },
+  { id: "local-2", question: "How would you deploy this app with Docker?", topic: "Docker", difficulty: "medium" },
+  { id: "local-3", question: "How would Redis improve an interview platform?", topic: "Redis", difficulty: "medium" }
 ];
 
-function unique(items) {
-  return Array.from(new Set(items));
-}
-
-function analyzeInputs(resumeName, jdText, answers) {
-  const lowerJd = jdText.toLowerCase();
-  const matchedSkills = unique(skillKeywords.filter((skill) => lowerJd.includes(skill)));
-  const expected = ["api", "auth", "sql", "redis", "testing", "communication"];
-  const gaps = expected.filter((skill) => !matchedSkills.includes(skill));
-  const answerText = answers.map((answer) => answer.text).join(" ").toLowerCase();
-  const hasAudio = answers.some((answer) => answer.audio);
-  const hasVideo = answers.some((answer) => answer.video);
-  const technicalScore = Math.min(94, 58 + matchedSkills.length * 4 + (answerText.includes("tradeoff") ? 8 : 0));
-  const communicationScore = Math.min(92, 62 + answers.filter((answer) => answer.text.length > 90).length * 7 + (hasAudio ? 6 : 0));
-  const confidenceScore = Math.min(90, 60 + (hasVideo ? 10 : 0) + answers.length * 4);
+function localAnalyze(resumeId, jobDescription) {
+  const text = jobDescription.toLowerCase();
+  const required = ["React", "Node.js", "Express", "Docker", "Redis", "JWT", "PostgreSQL"].filter((skill) =>
+    text.includes(skill.toLowerCase().replace(".", "")) || text.includes(skill.toLowerCase())
+  );
+  const missingSkills = (required.length ? required : ["Docker", "Redis"]).slice(0, 4);
 
   return {
-    resumeName,
-    matchedSkills,
-    gaps,
-    strengths: matchedSkills.slice(0, 5),
-    questions: seedQuestions.map((prompt, index) => ({
-      id: index + 1,
-      prompt,
-      competency: ["Resume Evidence", "System Design", "Communication", "Quality Engineering"][index]
-    })),
-    scores: {
-      overall: Math.round((technicalScore + communicationScore + confidenceScore) / 3),
-      technical: technicalScore,
-      communication: communicationScore,
-      confidence: confidenceScore
-    },
-    roadmap: [
-      { week: "Week 1", task: gaps[0] ? `Learn and document ${gaps[0]} fundamentals` : "Strengthen API design examples" },
-      { week: "Week 2", task: gaps[1] ? `Practice ${gaps[1]} interview questions` : "Practice system design tradeoffs" },
-      { week: "Week 3", task: "Run one full mock interview and update InterviewDNA" }
-    ],
-    schedule: ["Monday: 45 min skill practice", "Wednesday: 30 min question drill", "Saturday: full mock interview"]
+    sessionId: `local-${Date.now()}`,
+    resumeId,
+    agentFlow: ["Resume Parser", "JD Parser", "Skill Extraction", "Gap Analysis", "Question Generator", "Learning Planner"],
+    matchScore: 86,
+    strengths: ["React", "Node.js", "Express"],
+    missingSkills,
+    recommendations: missingSkills.map((skill) => `Learn ${skill} and prepare one project example.`),
+    questions: missingSkills.map((skill, index) => ({
+      id: `local-q-${index}`,
+      question: `Explain ${skill} for this target role.`,
+      topic: skill,
+      difficulty: index > 1 ? "medium" : "easy"
+    })).concat(fallbackQuestions).slice(0, 5)
   };
 }
 
-function Step({ number, label, active, done }) {
+async function api(path, { token, body, formData, method = "POST" } = {}) {
+  const response = await fetch(`${API_URL}${path}`, {
+    method,
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(body ? { "Content-Type": "application/json" } : {})
+    },
+    body: formData || (body ? JSON.stringify(body) : undefined)
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data.message || "Request failed");
+  return data;
+}
+
+function Step({ label, active, done }) {
   return (
     <div className={`step ${active ? "active" : ""} ${done ? "done" : ""}`}>
-      <span>{done ? <CheckCircle2 size={14} /> : number}</span>
+      <span>{done ? <CheckCircle2 size={14} /> : null}</span>
       {label}
     </div>
   );
 }
 
-function Metric({ label, value }) {
+function Stat({ icon: Icon, label, value }) {
   return (
-    <div className="metric">
+    <article className="stat-card">
+      <Icon size={18} />
       <span>{label}</span>
       <strong>{value}</strong>
-    </div>
+    </article>
   );
 }
 
 function App() {
-  const [step, setStep] = useState(0);
-  const [user, setUser] = useState({ name: "", email: "" });
+  const [page, setPage] = useState("login");
+  const [authMode, setAuthMode] = useState("login");
+  const [authForm, setAuthForm] = useState({ name: "", email: "", password: "" });
+  const [token, setToken] = useState("");
+  const [user, setUser] = useState(null);
   const [resume, setResume] = useState(null);
-  const [jdText, setJdText] = useState("");
-  const [answers, setAnswers] = useState(seedQuestions.map(() => ({ text: "", audio: null, video: null })));
-  const [saveMemory, setSaveMemory] = useState(true);
+  const [resumePreview, setResumePreview] = useState("");
+  const [jobDescription, setJobDescription] = useState("");
+  const [analysis, setAnalysis] = useState(null);
+  const [agentInput, setAgentInput] = useState("");
+  const [agentResult, setAgentResult] = useState(null);
+  const [answers, setAnswers] = useState({});
+  const [evaluations, setEvaluations] = useState({});
+  const [history, setHistory] = useState([]);
+  const [loading, setLoading] = useState("");
+  const [error, setError] = useState("");
 
-  const analysis = useMemo(
-    () => analyzeInputs(resume?.name || "Demo Resume.pdf", jdText, answers),
-    [resume, jdText, answers]
-  );
+  const activeStep = ["login", "dashboard", "upload", "analysis", "interview", "report", "profile"].indexOf(page);
+  const answeredCount = Object.keys(evaluations).length;
+  const averageInterviewScore = useMemo(() => {
+    const scores = Object.values(evaluations).map((item) => item.score);
+    if (!scores.length) return 0;
+    return Math.round(scores.reduce((total, score) => total + score, 0) / scores.length);
+  }, [evaluations]);
 
-  const canAnalyze = resume && jdText.trim().length > 80;
-  const reportReady = answers.some((answer) => answer.text.trim().length > 20 || answer.audio || answer.video);
+  async function submitAuth(event) {
+    event.preventDefault();
+    setError("");
+    setLoading(authMode === "login" ? "Signing in..." : "Creating account...");
+    try {
+      const path = authMode === "login" ? "/auth/login" : "/auth/signup";
+      const result = await api(path, { body: authForm });
+      setToken(result.token);
+      setUser(result.user);
+      setPage("dashboard");
+    } catch (authError) {
+      setError(authError.message);
+    } finally {
+      setLoading("");
+    }
+  }
 
-  function updateAnswer(index, patch) {
-    setAnswers((current) => current.map((answer, answerIndex) => (answerIndex === index ? { ...answer, ...patch } : answer)));
+  async function uploadResume(file) {
+    if (!file) return;
+    setError("");
+    setLoading("Uploading resume...");
+    try {
+      const formData = new FormData();
+      formData.append("resume", file);
+      const result = await api("/resume/upload", { token, formData });
+      setResume(result.resume);
+      setResumePreview(result.preview);
+    } catch (uploadError) {
+      setError(uploadError.message);
+    } finally {
+      setLoading("");
+    }
+  }
+
+  async function runAnalysis() {
+    setError("");
+    setAnalysis(null);
+    try {
+      for (const stage of loadingStages) {
+        setLoading(stage);
+        await new Promise((resolve) => setTimeout(resolve, 320));
+      }
+      const result = resume?.id
+        ? await api("/interview/analyze", { token, body: { resumeId: resume.id, jobDescription } })
+        : localAnalyze("demo-resume", jobDescription);
+      setAnalysis(result);
+      setPage("analysis");
+    } catch (analysisError) {
+      setError(analysisError.message);
+    } finally {
+      setLoading("");
+    }
+  }
+
+  async function runAgentWorkflow(event) {
+    event.preventDefault();
+    setError("");
+    setAgentResult(null);
+    setLoading("Running LangGraph workflow...");
+
+    try {
+      const result = await api("/api/agent/run", {
+        token,
+        body: { input: agentInput }
+      });
+      setAgentResult(result);
+    } catch (agentError) {
+      setError(agentError.message);
+    } finally {
+      setLoading("");
+    }
+  }
+
+  async function beginInterview() {
+    if (!analysis) return;
+    setError("");
+    setLoading("Starting AI interview...");
+    try {
+      const started = analysis.sessionId.startsWith("local-")
+        ? { questions: analysis.questions }
+        : await api("/interview/start", { token, body: { sessionId: analysis.sessionId } });
+      setAnalysis({ ...analysis, questions: started.questions });
+      setPage("interview");
+    } catch (startError) {
+      setError(startError.message);
+    } finally {
+      setLoading("");
+    }
+  }
+
+  async function evaluateQuestion(question) {
+    const candidateAnswer = answers[question.id] || "";
+    setError("");
+    setLoading("Evaluating answer...");
+    try {
+      const result = analysis.sessionId.startsWith("local-")
+        ? {
+            score: Math.min(95, 58 + Math.round(candidateAnswer.length / 6)),
+            feedback: `Good foundation. Connect the answer to ${question.topic} with one measurable project result.`,
+            idealAnswer: `Define ${question.topic}, give a resume-backed example, and explain one tradeoff.`,
+            confidence: 0.78
+          }
+        : await api("/interview/evaluate", {
+            token,
+            body: { sessionId: analysis.sessionId, questionId: question.id, candidateAnswer }
+          });
+      setEvaluations((current) => ({ ...current, [question.id]: result }));
+    } catch (evaluationError) {
+      setError(evaluationError.message);
+    } finally {
+      setLoading("");
+    }
+  }
+
+  async function loadHistory() {
+    setPage("profile");
+    if (!token) return;
+    try {
+      const result = await api("/interview/history", { token, method: "GET" });
+      setHistory(result.sessions || []);
+    } catch (_historyError) {
+      setHistory([]);
+    }
+  }
+
+  function logout() {
+    setToken("");
+    setUser(null);
+    setResume(null);
+    setAnalysis(null);
+    setPage("login");
   }
 
   return (
     <main className="app-shell">
       <aside className="sidebar">
         <div className="brand">
-          <BrainCircuit size={24} />
+          <BrainCircuit size={25} />
           <div>
-            <strong>InterviewDNA</strong>
-            <span>MVP demo</span>
+            <strong>Lumify</strong>
+            <span>Interview Intelligence</span>
           </div>
         </div>
-        {["Login", "Resume + JD", "Analysis", "Interview", "Report"].map((label, index) => (
-          <Step key={label} number={index + 1} label={label} active={step === index} done={step > index} />
+        {["Login", "Dashboard", "Upload", "Analysis", "Interview", "Report", "Profile"].map((label, index) => (
+          <Step key={label} label={label} active={index === activeStep} done={index < activeStep} />
         ))}
+        {user && (
+          <button className="nav-button" onClick={loadHistory}>
+            <History size={16} /> History
+          </button>
+        )}
         <div className="privacy-note">
-          <Lock size={16} />
-          <p>InterviewDNA memory is saved only when the candidate opts in.</p>
+          <ShieldCheck size={16} />
+          <p>JWT-protected demo routes. InterviewDNA history is persisted for this running server session.</p>
         </div>
       </aside>
 
       <section className="workspace">
-        {step === 0 && (
-          <section className="panel hero-panel">
-            <p className="eyebrow">Adaptive AI interview coach</p>
-            <h1>Resume to Interview Intelligence Report</h1>
-            <p>
-              Demo the complete core loop: login, resume upload, target JD,
-              competency analysis, adaptive interview, multimodal evaluation,
-              MVP memory, roadmap, and practice schedule.
-            </p>
-            <div className="auth-grid">
-              <label>
-                Name
-                <input value={user.name} onChange={(event) => setUser({ ...user, name: event.target.value })} placeholder="Ravi" />
-              </label>
-              <label>
-                Email
-                <input value={user.email} onChange={(event) => setUser({ ...user, email: event.target.value })} placeholder="ravi@example.com" />
-              </label>
+        <header className="topbar">
+          <div>
+            <p className="eyebrow">Milestone 2 Hackathon Build</p>
+            <h1>AI Interview Intelligence Platform</h1>
+          </div>
+          {user && (
+            <div className="user-pill">
+              <UserRound size={16} />
+              {user.name}
+              <button className="icon-button" title="Log out" onClick={logout}>
+                <LogOut size={16} />
+              </button>
             </div>
-            <button onClick={() => setStep(1)} disabled={!user.name || !user.email}>
-              <UserRound size={16} /> Continue
-            </button>
+          )}
+        </header>
+
+        {loading && <div className="loading-strip"><Loader2 size={18} />{loading}</div>}
+        {error && <div className="error-strip">{error}</div>}
+
+        {page === "login" && (
+          <section className="auth-layout">
+            <div className="intro-panel">
+              <Sparkles size={22} />
+              <h2>Resume to report in one polished demo flow.</h2>
+              <p>Login, upload a PDF resume, paste a JD, run the agent engine, answer questions, and show a final Interview Intelligence Report.</p>
+            </div>
+            <form className="panel auth-panel" onSubmit={submitAuth}>
+              <div className="segmented">
+                <button type="button" className={authMode === "login" ? "selected" : ""} onClick={() => setAuthMode("login")}>Login</button>
+                <button type="button" className={authMode === "signup" ? "selected" : ""} onClick={() => setAuthMode("signup")}>Register</button>
+              </div>
+              {authMode === "signup" && (
+                <label>Name<input value={authForm.name} onChange={(event) => setAuthForm({ ...authForm, name: event.target.value })} placeholder="Your name" /></label>
+              )}
+              <label>Email<input value={authForm.email} onChange={(event) => setAuthForm({ ...authForm, email: event.target.value })} placeholder="you@example.com" /></label>
+              <label>Password<input type="password" value={authForm.password} onChange={(event) => setAuthForm({ ...authForm, password: event.target.value })} placeholder="At least 6 characters" /></label>
+              <button type="submit"><Lock size={16} /> {authMode === "login" ? "Login" : "Create account"}</button>
+            </form>
           </section>
         )}
 
-        {step === 1 && (
+        {page === "dashboard" && (
+          <section className="dashboard">
+            <div className="stats-grid">
+              <Stat icon={Upload} label="Resume Uploaded" value={resume ? "Ready" : "Pending"} />
+              <Stat icon={BarChart3} label="Resume Score" value={analysis ? `${analysis.matchScore}%` : "--"} />
+              <Stat icon={BrainCircuit} label="Skill Match" value={analysis ? `${analysis.strengths.length} strengths` : "Not run"} />
+              <Stat icon={Play} label="Start Interview" value={analysis ? "Unlocked" : "Analyze first"} />
+            </div>
+            <div className="panel action-panel">
+              <h2>Run the core milestone workflow</h2>
+              <p>Upload a resume PDF, paste a target job description, then let the LangGraph-style pipeline produce gaps, questions, and a learning plan.</p>
+              <button onClick={() => setPage("upload")}><Upload size={16} /> Upload Resume</button>
+            </div>
+            <form className="panel action-panel" onSubmit={runAgentWorkflow}>
+              <div className="panel-title"><BrainCircuit size={20} /><h2>Core API Agent Check</h2></div>
+              <p>This calls the protected compatibility route from the milestone2 zip: <code>/api/agent/run</code>. The main analysis flow calls the FastAPI Agent Engine.</p>
+              <textarea value={agentInput} onChange={(event) => setAgentInput(event.target.value)} placeholder="Paste a short resume/JD prompt to run through InterviewAnalysisGraph." />
+              <button type="submit" disabled={agentInput.trim().length < 10}><BrainCircuit size={16} /> Run Agent</button>
+              {agentResult && (
+                <div className="feedback-box">
+                  <strong>{agentResult.output.graph} / {agentResult.output.matchScore}%</strong>
+                  <p>{agentResult.analysis}</p>
+                  <div className="chip-row">{agentResult.output.missingSkills.map((skill) => <span key={skill}>{skill}</span>)}</div>
+                </div>
+              )}
+            </form>
+          </section>
+        )}
+
+        {page === "upload" && (
           <section className="grid-two">
             <div className="panel">
-              <div className="panel-title">
-                <Upload size={20} />
-                <h2>Upload Resume</h2>
-              </div>
+              <div className="panel-title"><FileText size={20} /><h2>Upload Resume PDF</h2></div>
               <label className="dropzone">
-                <FileText size={34} />
-                <strong>{resume ? resume.name : "Choose PDF resume"}</strong>
-                <span>PDF upload is captured for the demo parser.</span>
-                <input accept=".pdf" type="file" onChange={(event) => setResume(event.target.files?.[0] || null)} />
+                <Upload size={34} />
+                <strong>{resume?.fileName || "Choose PDF resume"}</strong>
+                <span>Text is extracted and saved to the demo database layer.</span>
+                <input accept=".pdf,application/pdf" type="file" onChange={(event) => uploadResume(event.target.files?.[0])} />
               </label>
+              {resumePreview && <pre className="resume-preview">{resumePreview}</pre>}
             </div>
             <div className="panel">
-              <div className="panel-title">
-                <FileText size={20} />
-                <h2>Paste Job Description</h2>
-              </div>
-              <textarea
-                value={jdText}
-                onChange={(event) => setJdText(event.target.value)}
-                placeholder="Paste the target company job description here. Include skills, responsibilities, and expectations."
-              />
-              <button onClick={() => setStep(2)} disabled={!canAnalyze}>
-                <BrainCircuit size={16} /> Run Intelligence Engine
-              </button>
+              <div className="panel-title"><ClipboardList size={20} /><h2>Paste Job Description</h2></div>
+              <textarea value={jobDescription} onChange={(event) => setJobDescription(event.target.value)} placeholder="Paste the target job description. Include role requirements, skills, and responsibilities." />
+              <button onClick={runAnalysis} disabled={!resume || jobDescription.trim().length < 40}><BrainCircuit size={16} /> Analyze Resume</button>
             </div>
           </section>
         )}
 
-        {step === 2 && (
+        {page === "analysis" && analysis && (
           <section className="grid-two">
             <div className="panel">
-              <div className="panel-title">
-                <BrainCircuit size={20} />
-                <h2>Competency Intelligence Engine</h2>
-              </div>
-              <div className="chip-row">
-                {analysis.strengths.length ? analysis.strengths.map((skill) => <span key={skill}>{skill}</span>) : <span>resume evidence</span>}
-              </div>
-              <h3>Existing strengths</h3>
-              <p>{analysis.strengths.length ? analysis.strengths.join(", ") : "Resume evidence is ready for review."}</p>
-              <h3>Missing competencies</h3>
-              <div className="warning-list">
-                {analysis.gaps.map((gap) => <span key={gap}>{gap}</span>)}
-              </div>
+              <p className="eyebrow">Skill Gap Analysis</p>
+              <h2>{analysis.matchScore}% match score</h2>
+              <div className="score-ring">{analysis.matchScore}</div>
+              <h3>Strengths</h3>
+              <div className="chip-row">{analysis.strengths.map((skill) => <span key={skill}>{skill}</span>)}</div>
+              <h3>Missing Skills</h3>
+              <div className="warning-list">{analysis.missingSkills.map((skill) => <span key={skill}>{skill}</span>)}</div>
             </div>
             <div className="panel">
-              <div className="panel-title">
-                <Play size={20} />
-                <h2>Adaptive Interview Planner</h2>
-              </div>
+              <div className="panel-title"><BrainCircuit size={20} /><h2>Agent Engine Flow</h2></div>
+              {analysis.poweredBy && <p className="engine-badge">Powered by {analysis.poweredBy}</p>}
+              <div className="flow-list">{analysis.agentFlow.map((step) => <span key={step}>{step}</span>)}</div>
+              <h3>Generated Interview Questions</h3>
               {analysis.questions.map((question) => (
-                <article className="question-preview" key={question.id}>
-                  <span>{question.competency}</span>
-                  <p>{question.prompt}</p>
-                </article>
+                <article className="question-preview" key={question.id}><span>{question.topic}</span><p>{question.question}</p></article>
               ))}
-              <button onClick={() => setStep(3)}>
-                <Play size={16} /> Start AI Interview
-              </button>
+              <button onClick={beginInterview}><Play size={16} /> Start AI Interview</button>
             </div>
           </section>
         )}
 
-        {step === 3 && (
+        {page === "interview" && analysis && (
           <section className="panel">
-            <div className="panel-title">
-              <Mic size={20} />
-              <h2>AI Mock Interview</h2>
-            </div>
+            <div className="panel-title"><Play size={20} /><h2>AI Interview</h2></div>
             <div className="interview-list">
-              {analysis.questions.map((question, index) => (
+              {analysis.questions.map((question) => (
                 <article className="interview-card" key={question.id}>
-                  <span>{question.competency}</span>
-                  <h3>{question.prompt}</h3>
-                  <textarea
-                    value={answers[index].text}
-                    onChange={(event) => updateAnswer(index, { text: event.target.value })}
-                    placeholder="Type the candidate answer here..."
-                  />
-                  <div className="media-row">
-                    <label>
-                      <Mic size={16} /> Audio ref
-                      <input accept="audio/*" type="file" onChange={(event) => updateAnswer(index, { audio: event.target.files?.[0]?.name || null })} />
-                    </label>
-                    <label>
-                      <Video size={16} /> Video ref
-                      <input accept="video/*" type="file" onChange={(event) => updateAnswer(index, { video: event.target.files?.[0]?.name || null })} />
-                    </label>
-                  </div>
+                  <span>{question.topic} / {question.difficulty || "adaptive"}</span>
+                  <h3>{question.question}</h3>
+                  <textarea value={answers[question.id] || ""} onChange={(event) => setAnswers({ ...answers, [question.id]: event.target.value })} placeholder="Type the candidate answer..." />
+                  <button onClick={() => evaluateQuestion(question)} disabled={(answers[question.id] || "").trim().length < 10}><BookOpenCheck size={16} /> Evaluate Answer</button>
+                  {evaluations[question.id] && <div className="feedback-box"><strong>{evaluations[question.id].score}%</strong><p>{evaluations[question.id].feedback}</p></div>}
                 </article>
               ))}
             </div>
-            <button onClick={() => setStep(4)} disabled={!reportReady}>
-              <BarChart3 size={16} /> Generate Interview Intelligence Report
-            </button>
+            <button onClick={() => setPage("report")} disabled={!answeredCount}><BarChart3 size={16} /> View Final Report</button>
           </section>
         )}
 
-        {step === 4 && (
+        {page === "report" && analysis && (
           <section className="report-grid">
             <div className="panel report-main">
               <p className="eyebrow">Interview Intelligence Report</p>
-              <h2>{user.name}'s InterviewDNA</h2>
-              <div className="metrics">
-                <Metric label="Overall" value={`${analysis.scores.overall}%`} />
-                <Metric label="Technical" value={`${analysis.scores.technical}%`} />
-                <Metric label="Communication" value={`${analysis.scores.communication}%`} />
-                <Metric label="Confidence" value={`${analysis.scores.confidence}%`} />
+              <h2>{user?.name}'s InterviewDNA</h2>
+              <div className="stats-grid compact">
+                <Stat icon={BarChart3} label="Overall Score" value={`${Math.round((analysis.matchScore + averageInterviewScore) / (averageInterviewScore ? 2 : 1))}%`} />
+                <Stat icon={BrainCircuit} label="Skill Match" value={`${analysis.matchScore}%`} />
+                <Stat icon={BookOpenCheck} label="Answer Score" value={averageInterviewScore ? `${averageInterviewScore}%` : "--"} />
               </div>
-              <h3>Multimodal Evaluation Engine</h3>
-              <p>
-                Text answers were evaluated for technical depth. Audio and video
-                references are captured as MVP signals for speech and presence
-                analysis.
-              </p>
-              <h3>InterviewDNA MVP Memory</h3>
-              <label className="toggle">
-                <input type="checkbox" checked={saveMemory} onChange={(event) => setSaveMemory(event.target.checked)} />
-                Save current session summary for personalized coaching
-              </label>
-              <p>
-                {saveMemory
-                  ? "This session summary is stored for the demo. Future interviews can use it to target weak areas."
-                  : "Privacy mode: interview data is processed temporarily and discarded after report generation."}
-              </p>
+              <h3>Weaknesses</h3>
+              <div className="warning-list">{analysis.missingSkills.map((skill) => <span key={skill}>{skill}</span>)}</div>
+              <h3>Interview Feedback</h3>
+              {Object.entries(evaluations).map(([id, item]) => <p className="feedback-line" key={id}>{item.score}% - {item.feedback}</p>)}
             </div>
             <div className="panel">
-              <div className="panel-title">
-                <CalendarDays size={20} />
-                <h2>Learning Roadmap</h2>
-              </div>
-              {analysis.roadmap.map((item) => (
-                <article className="roadmap-item" key={item.week}>
-                  <span>{item.week}</span>
-                  <p>{item.task}</p>
-                </article>
+              <div className="panel-title"><BookOpenCheck size={20} /><h2>Recommended Learning</h2></div>
+              {analysis.recommendations.map((item, index) => (
+                <article className="roadmap-item" key={item}><span>Priority {index + 1}</span><p>{item}</p></article>
               ))}
-              <h3>Suggested Practice Schedule</h3>
-              {analysis.schedule.map((item) => <p className="schedule" key={item}>{item}</p>)}
-              <button onClick={() => setStep(1)} className="secondary">Run another demo</button>
+              <h3>Next Interview Plan</h3>
+              <p className="schedule">Run a focused mock interview on {analysis.missingSkills[0] || "system design"} next.</p>
+              <button onClick={() => setPage("upload")} className="secondary">New Analysis</button>
+            </div>
+          </section>
+        )}
+
+        {page === "profile" && (
+          <section className="grid-two">
+            <div className="panel">
+              <div className="panel-title"><UserRound size={20} /><h2>Profile API</h2></div>
+              <p>{user?.name}</p>
+              <p>{user?.email}</p>
+            </div>
+            <div className="panel">
+              <div className="panel-title"><History size={20} /><h2>Interview History</h2></div>
+              {history.length ? history.map((item) => (
+                <article className="roadmap-item" key={item.id}><span>{new Date(item.createdAt).toLocaleString()}</span><p>{item.matchScore}% match - {item.missingSkills.join(", ") || "No gaps"}</p></article>
+              )) : <p>No saved interview sessions yet.</p>}
             </div>
           </section>
         )}

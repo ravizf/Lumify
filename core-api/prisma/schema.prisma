@@ -70,6 +70,8 @@ model Resume {
   id           String       @id @default(uuid())
   userId       String
   fileUrl      String
+  fileName     String?
+  resumeText   String?
   parsedText   String?
   summary      String?
   createdAt    DateTime     @default(now())
@@ -77,6 +79,7 @@ model Resume {
   user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   skills       Skill[]
   assessments  Assessment[]
+  interviewSessions InterviewSession[]
 }
 
 model TargetCompany {
@@ -203,15 +206,31 @@ model Hint {
 model InterviewSession {
   id          String              @id @default(uuid())
   userId      String
+  resumeId    String?
+  jobDescription String?
+  matchScore  Int?
   roadmapId   String?
   scheduledAt DateTime?
   transcript  String?
   status      InterviewStatus     @default(scheduled)
   createdAt   DateTime            @default(now())
   user        User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  resume      Resume?             @relation(fields: [resumeId], references: [id])
   roadmap     LearningRoadmap?    @relation(fields: [roadmapId], references: [id])
   attempts    QuestionAttempt[]
+  interviewQuestions InterviewQuestion[]
   feedback    InterviewFeedback?
+}
+
+model InterviewQuestion {
+  id              String           @id @default(uuid())
+  sessionId       String
+  question        String
+  candidateAnswer String?
+  aiFeedback      String?
+  score           Int?
+  createdAt       DateTime         @default(now())
+  session         InterviewSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 }
 
 model InterviewFeedback {
@@ -245,6 +264,9 @@ model LearningRoadmap {
   id            String             @id @default(uuid())
   userId        String
   assessmentId  String             @unique
+  sessionId     String?
+  recommendation String?
+  priority      String?
   title         String
   summary       String?
   createdAt     DateTime           @default(now())
