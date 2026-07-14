@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { PDFParse } from "pdf-parse";
+import { isPrismaConnectionError, prisma } from "./prisma.service.js";
 import { store } from "./store.service.js";
 
 export async function enqueueResumeAnalysis(payload) {
@@ -29,13 +30,30 @@ export async function saveUploadedResume({ userId, file }) {
     resumeText = `Unable to extract text from ${file.originalname}. Add resume text manually before the demo if this PDF is scanned.`;
   }
 
-  const resume = {
+  let resume = {
     id: randomUUID(),
     userId,
     resumeText,
     fileName: file.originalname,
+    fileUrl: `upload://${file.originalname}`,
     createdAt: new Date().toISOString()
   };
+
+  try {
+    resume = await prisma.resume.create({
+      data: {
+        userId,
+        fileUrl: `upload://${file.originalname}`,
+        fileName: file.originalname,
+        resumeText,
+        parsedText: resumeText
+      }
+    });
+  } catch (error) {
+    if (!isPrismaConnectionError(error)) {
+      throw error;
+    }
+  }
 
   store.resumes.push(resume);
 

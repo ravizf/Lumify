@@ -246,6 +246,13 @@ label {
   color: #ffb0b0;
 }
 
+.helper-text {
+  margin: -4px 0 0;
+  color: #aab8cc;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
 .panel,
 .metric,
 .question-preview,
@@ -546,7 +553,7 @@ h3 {
   border-radius: 999px;
   background:
     radial-gradient(circle at center, #121823 58%, transparent 60%),
-    conic-gradient(#57d6a3 0 86%, #293244 86% 100%);
+    conic-gradient(#57d6a3 0 calc(var(--score, 0) * 1%), #293244 calc(var(--score, 0) * 1%) 100%);
   color: #edf5ff;
   font-size: 2.4rem;
   font-weight: 900;

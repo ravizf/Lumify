@@ -226,6 +226,8 @@ model InterviewQuestion {
   id              String           @id @default(uuid())
   sessionId       String
   question        String
+  topic           String?
+  difficulty      String?
   candidateAnswer String?
   aiFeedback      String?
   score           Int?
@@ -263,7 +265,7 @@ model InterviewDnaMemory {
 model LearningRoadmap {
   id            String             @id @default(uuid())
   userId        String
-  assessmentId  String             @unique
+  assessmentId  String?            @unique
   sessionId     String?
   recommendation String?
   priority      String?
@@ -271,7 +273,7 @@ model LearningRoadmap {
   summary       String?
   createdAt     DateTime           @default(now())
   user          User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  assessment    Assessment         @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  assessment    Assessment?        @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
   tasks         RoadmapTask[]
   sessions      InterviewSession[]
 }

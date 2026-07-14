@@ -9,7 +9,9 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter(_req, file, callback) {
     if (file.mimetype !== "application/pdf") {
-      return callback(new Error("Only PDF resumes are supported"));
+      const error = new Error("Please upload a PDF resume.");
+      error.statusCode = 400;
+      return callback(error);
     }
 
     callback(null, true);

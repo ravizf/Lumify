@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { runAgentEngineAnalysis } from "./agentEngine.service.js";
+import { isPrismaConnectionError, prisma } from "./prisma.service.js";
 import { store } from "./store.service.js";
 
 const skillCatalog = [
@@ -49,7 +50,7 @@ function buildQuestion(skill, index) {
   };
 }
 
-function persistAnalysis({ userId, resumeId, jobDescription, analysis }) {
+async function persistAnalysis({ userId, resumeId, jobDescription, analysis }) {
   const questions = analysis.questions.map((question, index) => ({
     id: question.id || randomUUID(),
     question: question.question,
@@ -68,6 +69,61 @@ function persistAnalysis({ userId, resumeId, jobDescription, analysis }) {
     recommendations: analysis.recommendations,
     createdAt: new Date().toISOString()
   };
+
+  try {
+    const persisted = await prisma.interviewSession.create({
+      data: {
+        id: session.id,
+        userId,
+        resumeId,
+        jobDescription,
+        matchScore: analysis.matchScore,
+        status: "live",
+        interviewQuestions: {
+          create: questions.map((question) => ({
+            id: question.id,
+            question: question.question,
+            topic: question.topic,
+            difficulty: question.difficulty
+          }))
+        }
+      },
+      include: {
+        interviewQuestions: true
+      }
+    });
+
+    await prisma.learningRoadmap.createMany({
+      data: analysis.recommendations.map((recommendation, index) => ({
+        userId,
+        sessionId: persisted.id,
+        title: `Priority ${index + 1}: ${recommendation}`,
+        recommendation,
+        priority: index === 0 ? "high" : "medium"
+      }))
+    });
+
+    return {
+      sessionId: persisted.id,
+      agentFlow: analysis.agentFlow,
+      graph: analysis.graph || "InterviewAnalysisGraph",
+      poweredBy: analysis.poweredBy || "local-fallback",
+      matchScore: analysis.matchScore,
+      strengths: analysis.strengths,
+      missingSkills: analysis.missingSkills,
+      recommendations: analysis.recommendations,
+      questions: persisted.interviewQuestions.map((question) => ({
+        id: question.id,
+        question: question.question,
+        topic: question.topic || "General",
+        difficulty: question.difficulty || "easy"
+      }))
+    };
+  } catch (error) {
+    if (!isPrismaConnectionError(error)) {
+      throw error;
+    }
+  }
 
   store.sessions.push(session);
   questions.forEach((question) => {
@@ -95,7 +151,7 @@ function persistAnalysis({ userId, resumeId, jobDescription, analysis }) {
   };
 }
 
-function localAnalyze({ userId, resumeId, jobDescription, resume }) {
+async function localAnalyze({ userId, resumeId, jobDescription, resume }) {
   const resumeSkills = findSkills(resume.resumeText);
   const requiredSkills = findSkills(jobDescription);
   const jdSkills = requiredSkills.length ? requiredSkills : fallbackSkills(jobDescription);
@@ -133,7 +189,22 @@ function localAnalyze({ userId, resumeId, jobDescription, resume }) {
 }
 
 export async function analyzeInterview({ userId, resumeId, jobDescription }) {
-  const resume = store.resumes.find((item) => item.id === resumeId && item.userId === userId);
+  let resume = null;
+
+  try {
+    resume = await prisma.resume.findFirst({
+      where: {
+        id: resumeId,
+        userId
+      }
+    });
+  } catch (error) {
+    if (!isPrismaConnectionError(error)) {
+      throw error;
+    }
+  }
+
+  resume = resume || store.resumes.find((item) => item.id === resumeId && item.userId === userId);
 
   if (!resume) {
     const error = new Error("Resume not found");
@@ -147,19 +218,53 @@ export async function analyzeInterview({ userId, resumeId, jobDescription }) {
       jobDescription
     });
 
-    return persistAnalysis({
+    return await persistAnalysis({
       userId,
       resumeId,
       jobDescription,
       analysis: agentAnalysis
     });
   } catch (_error) {
-    return localAnalyze({ userId, resumeId, jobDescription, resume });
+    return await localAnalyze({ userId, resumeId, jobDescription, resume });
   }
 }
 
-export function startInterview({ userId, sessionId }) {
-  const session = store.sessions.find((item) => item.id === sessionId && item.userId === userId);
+export async function startInterview({ userId, sessionId }) {
+  let session = null;
+
+  try {
+    session = await prisma.interviewSession.findFirst({
+      where: {
+        id: sessionId,
+        userId
+      },
+      include: {
+        interviewQuestions: true
+      }
+    });
+
+    if (session) {
+      return {
+        sessionId,
+        status: "live",
+        questions: session.interviewQuestions.map((question) => ({
+          id: question.id,
+          question: question.question,
+          topic: question.topic || "General",
+          difficulty: question.difficulty || "easy",
+          candidateAnswer: question.candidateAnswer,
+          aiFeedback: question.aiFeedback,
+          score: question.score
+        }))
+      };
+    }
+  } catch (error) {
+    if (!isPrismaConnectionError(error)) {
+      throw error;
+    }
+  }
+
+  session = store.sessions.find((item) => item.id === sessionId && item.userId === userId);
 
   if (!session) {
     const error = new Error("Interview session not found");
@@ -174,9 +279,33 @@ export function startInterview({ userId, sessionId }) {
   };
 }
 
-export function evaluateAnswer({ userId, sessionId, questionId, candidateAnswer }) {
-  const session = store.sessions.find((item) => item.id === sessionId && item.userId === userId);
-  const question = store.questions.find((item) => item.id === questionId && item.sessionId === sessionId);
+export async function evaluateAnswer({ userId, sessionId, questionId, candidateAnswer }) {
+  let session = null;
+  let question = null;
+
+  try {
+    session = await prisma.interviewSession.findFirst({
+      where: {
+        id: sessionId,
+        userId
+      }
+    });
+    question = session
+      ? await prisma.interviewQuestion.findFirst({
+          where: {
+            id: questionId,
+            sessionId
+          }
+        })
+      : null;
+  } catch (error) {
+    if (!isPrismaConnectionError(error)) {
+      throw error;
+    }
+  }
+
+  session = session || store.sessions.find((item) => item.id === sessionId && item.userId === userId);
+  question = question || store.questions.find((item) => item.id === questionId && item.sessionId === sessionId);
 
   if (!session || !question) {
     const error = new Error("Question not found for this session");
@@ -198,6 +327,23 @@ export function evaluateAnswer({ userId, sessionId, questionId, candidateAnswer 
     score: roundedScore
   });
 
+  if (question.sessionId) {
+    try {
+      await prisma.interviewQuestion.update({
+        where: { id: question.id },
+        data: {
+          candidateAnswer,
+          aiFeedback: feedback,
+          score: roundedScore
+        }
+      });
+    } catch (error) {
+      if (!isPrismaConnectionError(error)) {
+        throw error;
+      }
+    }
+  }
+
   return {
     score: roundedScore,
     feedback,
@@ -206,7 +352,38 @@ export function evaluateAnswer({ userId, sessionId, questionId, candidateAnswer 
   };
 }
 
-export function interviewHistory(userId) {
+export async function interviewHistory(userId) {
+  try {
+    const sessions = await prisma.interviewSession.findMany({
+      where: { userId },
+      include: {
+        interviewQuestions: true
+      },
+      orderBy: { createdAt: "desc" }
+    });
+    const roadmaps = await prisma.learningRoadmap.findMany({
+      where: { userId }
+    });
+
+    if (sessions.length) {
+      return sessions.map((session) => ({
+        ...session,
+        missingSkills: [],
+        strengths: [],
+        recommendations: roadmaps
+          .filter((roadmap) => roadmap.sessionId === session.id)
+          .map((roadmap) => roadmap.recommendation)
+          .filter(Boolean),
+        questions: session.interviewQuestions,
+        roadmap: roadmaps.filter((roadmap) => roadmap.sessionId === session.id)
+      }));
+    }
+  } catch (error) {
+    if (!isPrismaConnectionError(error)) {
+      throw error;
+    }
+  }
+
   return store.sessions
     .filter((session) => session.userId === userId)
     .map((session) => ({

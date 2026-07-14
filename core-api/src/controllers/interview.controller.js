@@ -19,24 +19,28 @@ export async function analyze(req, res, next) {
   }
 }
 
-export function start(req, res, next) {
+export async function start(req, res, next) {
   try {
     const payload = startSchema.parse(req.body);
-    res.json(startInterview({ userId: req.user.id, ...payload }));
+    res.json(await startInterview({ userId: req.user.id, ...payload }));
   } catch (error) {
     next(error);
   }
 }
 
-export function evaluate(req, res, next) {
+export async function evaluate(req, res, next) {
   try {
     const payload = evaluateSchema.parse(req.body);
-    res.json(evaluateAnswer({ userId: req.user.id, ...payload }));
+    res.json(await evaluateAnswer({ userId: req.user.id, ...payload }));
   } catch (error) {
     next(error);
   }
 }
 
-export function history(req, res) {
-  res.json({ sessions: interviewHistory(req.user.id) });
+export async function history(req, res, next) {
+  try {
+    res.json({ sessions: await interviewHistory(req.user.id) });
+  } catch (error) {
+    next(error);
+  }
 }

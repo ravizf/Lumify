@@ -14,7 +14,7 @@ const app = express();
 const port = env.port;
 
 app.use(helmet());
-app.use(cors({ origin: env.frontendOrigin }));
+app.use(cors({ origin: env.allowedOrigins }));
 app.use(express.json({ limit: "2mb" }));
 
 app.use("/health", healthRoutes);

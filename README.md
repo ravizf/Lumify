@@ -388,7 +388,7 @@ Request:
 - PostgreSQL for Prisma-backed production persistence
 - Gemini API key for AI-powered Agent Engine responses
 
-Milestone 2 currently includes a demo in-memory store in the Core API so the hackathon flow can run immediately without requiring a database migration during presentation setup.
+Milestone 2 persists users, resumes, interview sessions, interview questions, and learning roadmap rows through PostgreSQL using Prisma. The Core API still has a deterministic fallback for AI analysis when the Agent Engine or Gemini key is unavailable, but database persistence is part of the working demo path.
 
 ### 1. Install Root Dependencies
 
@@ -531,8 +531,7 @@ Lumify/
 
 Planned after Milestone 2:
 
-- Persist all auth, resume, interview, question, and roadmap data fully through PostgreSQL
-- Add production Prisma migrations and seed data
+- Add seed data and richer database-backed analytics
 - Add Gemini-powered answer evaluation in the Agent Engine
 - Add richer LangGraph state and conditional edges
 - Add speech analysis

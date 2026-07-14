@@ -29,6 +29,8 @@ const loadingStages = [
   "Generating questions..."
 ];
 
+const MIN_JOB_DESCRIPTION_LENGTH = 40;
+
 const fallbackQuestions = [
   { id: "local-1", question: "Explain JWT authentication.", topic: "JWT", difficulty: "easy" },
   { id: "local-2", question: "How would you deploy this app with Docker?", topic: "Docker", difficulty: "medium" },
@@ -69,7 +71,12 @@ async function api(path, { token, body, formData, method = "POST" } = {}) {
     body: formData || (body ? JSON.stringify(body) : undefined)
   });
   const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(data.message || "Request failed");
+  if (!response.ok) {
+    const issue = data.issues?.[0]?.message;
+    const error = new Error(issue || data.message || "Something went wrong. Please try again.");
+    error.status = response.status;
+    throw error;
+  }
   return data;
 }
 
@@ -96,8 +103,11 @@ function App() {
   const [page, setPage] = useState("login");
   const [authMode, setAuthMode] = useState("login");
   const [authForm, setAuthForm] = useState({ name: "", email: "", password: "" });
-  const [token, setToken] = useState("");
-  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(() => localStorage.getItem("lumify_token") || "");
+  const [user, setUser] = useState(() => {
+    const stored = localStorage.getItem("lumify_user");
+    return stored ? JSON.parse(stored) : null;
+  });
   const [resume, setResume] = useState(null);
   const [resumePreview, setResumePreview] = useState("");
   const [jobDescription, setJobDescription] = useState("");
@@ -110,7 +120,8 @@ function App() {
   const [loading, setLoading] = useState("");
   const [error, setError] = useState("");
 
-  const activeStep = ["login", "dashboard", "upload", "analysis", "interview", "report", "profile"].indexOf(page);
+  const activeStep = ["login", "dashboard", "upload", "analysis", "interview", "report", "profile"].indexOf(user && page === "login" ? "dashboard" : page);
+  const canAnalyze = Boolean(resume) && jobDescription.trim().length >= MIN_JOB_DESCRIPTION_LENGTH;
   const answeredCount = Object.keys(evaluations).length;
   const averageInterviewScore = useMemo(() => {
     const scores = Object.values(evaluations).map((item) => item.score);
@@ -127,12 +138,24 @@ function App() {
       const result = await api(path, { body: authForm });
       setToken(result.token);
       setUser(result.user);
+      localStorage.setItem("lumify_token", result.token);
+      localStorage.setItem("lumify_user", JSON.stringify(result.user));
       setPage("dashboard");
     } catch (authError) {
       setError(authError.message);
     } finally {
       setLoading("");
     }
+  }
+
+  function handleRequestError(requestError) {
+    if (requestError.status === 401) {
+      logout();
+      setError("Your session expired. Please log in again.");
+      return;
+    }
+
+    setError(requestError.message);
   }
 
   async function uploadResume(file) {
@@ -146,7 +169,7 @@ function App() {
       setResume(result.resume);
       setResumePreview(result.preview);
     } catch (uploadError) {
-      setError(uploadError.message);
+      handleRequestError(uploadError);
     } finally {
       setLoading("");
     }
@@ -166,7 +189,7 @@ function App() {
       setAnalysis(result);
       setPage("analysis");
     } catch (analysisError) {
-      setError(analysisError.message);
+      handleRequestError(analysisError);
     } finally {
       setLoading("");
     }
@@ -185,7 +208,7 @@ function App() {
       });
       setAgentResult(result);
     } catch (agentError) {
-      setError(agentError.message);
+      handleRequestError(agentError);
     } finally {
       setLoading("");
     }
@@ -202,7 +225,7 @@ function App() {
       setAnalysis({ ...analysis, questions: started.questions });
       setPage("interview");
     } catch (startError) {
-      setError(startError.message);
+      handleRequestError(startError);
     } finally {
       setLoading("");
     }
@@ -226,7 +249,7 @@ function App() {
           });
       setEvaluations((current) => ({ ...current, [question.id]: result }));
     } catch (evaluationError) {
-      setError(evaluationError.message);
+      handleRequestError(evaluationError);
     } finally {
       setLoading("");
     }
@@ -239,13 +262,15 @@ function App() {
       const result = await api("/interview/history", { token, method: "GET" });
       setHistory(result.sessions || []);
     } catch (_historyError) {
-      setHistory([]);
+      handleRequestError(_historyError);
     }
   }
 
   function logout() {
     setToken("");
     setUser(null);
+    localStorage.removeItem("lumify_token");
+    localStorage.removeItem("lumify_user");
     setResume(null);
     setAnalysis(null);
     setPage("login");
@@ -295,7 +320,7 @@ function App() {
         {loading && <div className="loading-strip"><Loader2 size={18} />{loading}</div>}
         {error && <div className="error-strip">{error}</div>}
 
-        {page === "login" && (
+        {page === "login" && !user && (
           <section className="auth-layout">
             <div className="intro-panel">
               <Sparkles size={22} />
@@ -317,7 +342,7 @@ function App() {
           </section>
         )}
 
-        {page === "dashboard" && (
+        {(page === "dashboard" || (page === "login" && user)) && (
           <section className="dashboard">
             <div className="stats-grid">
               <Stat icon={Upload} label="Resume Uploaded" value={resume ? "Ready" : "Pending"} />
@@ -361,7 +386,12 @@ function App() {
             <div className="panel">
               <div className="panel-title"><ClipboardList size={20} /><h2>Paste Job Description</h2></div>
               <textarea value={jobDescription} onChange={(event) => setJobDescription(event.target.value)} placeholder="Paste the target job description. Include role requirements, skills, and responsibilities." />
-              <button onClick={runAnalysis} disabled={!resume || jobDescription.trim().length < 40}><BrainCircuit size={16} /> Analyze Resume</button>
+              <button onClick={runAnalysis} disabled={!canAnalyze}><BrainCircuit size={16} /> Analyze Resume</button>
+              {!canAnalyze && (
+                <p className="helper-text">
+                  Upload a PDF resume and paste at least {MIN_JOB_DESCRIPTION_LENGTH} characters from the job description.
+                </p>
+              )}
             </div>
           </section>
         )}
@@ -371,7 +401,7 @@ function App() {
             <div className="panel">
               <p className="eyebrow">Skill Gap Analysis</p>
               <h2>{analysis.matchScore}% match score</h2>
-              <div className="score-ring">{analysis.matchScore}</div>
+              <div className="score-ring" style={{ "--score": analysis.matchScore }}>{analysis.matchScore}</div>
               <h3>Strengths</h3>
               <div className="chip-row">{analysis.strengths.map((skill) => <span key={skill}>{skill}</span>)}</div>
               <h3>Missing Skills</h3>
