@@ -378,7 +378,7 @@ function App() {
               <label className="dropzone">
                 <Upload size={34} />
                 <strong>{resume?.fileName || "Choose PDF resume"}</strong>
-                <span>Text is extracted and saved to the demo database layer.</span>
+                <span>Resume text extracted successfully and stored in PostgreSQL using Prisma.</span>
                 <input accept=".pdf,application/pdf" type="file" onChange={(event) => uploadResume(event.target.files?.[0])} />
               </label>
               {resumePreview && <pre className="resume-preview">{resumePreview}</pre>}
