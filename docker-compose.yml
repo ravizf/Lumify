@@ -15,7 +15,7 @@ services:
     ports:
       - "4000:4000"
     environment:
-      DATABASE_URL: postgresql://interviewdna:interviewdna@postgres:5432/interviewdna
+      DATABASE_URL: postgresql://lumify:lumify@postgres:5432/lumify
       REDIS_URL: redis://redis:6379
       FRONTEND_ORIGIN: http://localhost:5173
     depends_on:
@@ -38,9 +38,9 @@ services:
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_USER: interviewdna
-      POSTGRES_PASSWORD: interviewdna
-      POSTGRES_DB: interviewdna
+      POSTGRES_USER: lumify
+      POSTGRES_PASSWORD: lumify
+      POSTGRES_DB: lumify
     volumes:
       - postgres-data:/var/lib/postgresql/data
 

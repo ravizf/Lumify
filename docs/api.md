@@ -62,10 +62,10 @@ Response: `201 Created`
 }
 ```
 
-Milestone 1 keeps endpoints intentionally minimal. The API contract is designed
-so later milestones can add company selection, target role parsing,
-multimodal attempts, feedback reports, roadmap tasks, and calendar scheduling
-without changing the repository boundaries.
+Milestone 2 keeps endpoints focused on the implemented interview preparation
+flow. Future milestones can add speech/video attempts, richer feedback reports,
+roadmap automation, and calendar scheduling without changing the repository
+boundaries.
 
 ## Demo Interview Report
 
@@ -83,14 +83,11 @@ without changing the repository boundaries.
   "answers": [
     {
       "question": "Explain your backend experience.",
-      "text": "I built APIs with auth and SQL.",
-      "audioRef": "answer.webm",
-      "videoRef": "answer.mp4"
+      "text": "I built APIs with auth and SQL."
     }
   ]
 }
 ```
 
 Returns an `Interview Intelligence Report` with scores, strengths, gaps,
-InterviewDNA MVP memory status, roadmap tasks, and a suggested practice
-schedule.
+InterviewDNA profile status, roadmap tasks, and learning recommendations.

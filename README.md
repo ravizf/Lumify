@@ -2,7 +2,7 @@
 
 AI Interview Intelligence Platform for resume-based interview preparation.
 
-Lumify helps candidates upload a resume, paste a target job description, receive a skill gap analysis, generate personalized interview questions, answer those questions, and review an interview intelligence report.
+Lumify is an AI-powered interview preparation platform that helps candidates prepare for technical interviews through resume intelligence, competency analysis, AI-powered mock interviews, and personalized InterviewDNA insights.
 
 This repository is currently focused on **Milestone 2**: authentication, frontend-backend communication, resume upload, protected interview analysis, and a working LangGraph agent workflow through the Agent Engine.
 
@@ -25,6 +25,7 @@ Completed for Milestone 2:
 - Interview session start endpoint
 - Answer evaluation endpoint
 - Interview history endpoint
+- InterviewDNA profile foundation
 - Final report UI with match score, strengths, gaps, feedback, and learning recommendations
 
 Not included in Milestone 2:
@@ -39,6 +40,23 @@ Not included in Milestone 2:
 - Recruiter dashboard
 - Enterprise features
 
+## Why Lumify?
+
+Unlike traditional interview preparation platforms that focus only on asking questions, Lumify provides an AI-powered interview intelligence experience.
+
+Current Milestone 2 capabilities include:
+
+- Resume Intelligence
+- Job Description Analysis
+- Competency Gap Analysis
+- Personalized Interview Question Generation
+- AI Answer Evaluation
+- InterviewDNA Profile
+- Learning Recommendations
+- Interview Intelligence Report
+
+Future capabilities are listed under the Milestone 3+ Future Roadmap.
+
 ## Architecture
 
 ```text
@@ -47,11 +65,13 @@ Frontend (React + Vite)
         v
 Core API (Express.js)
         |
+        +--> PostgreSQL (Prisma)
+        |
         v
 Agent Engine (FastAPI + LangGraph)
         |
         v
-Gemini API
+Gemini AI
         |
         v
 Core API
@@ -102,6 +122,12 @@ The workflow returns structured JSON:
   ]
 }
 ```
+
+## InterviewDNA Module
+
+Lumify includes InterviewDNA as a personalized interview profile module. It captures interview summaries, answer feedback, competency gaps, strengths, and learning recommendations so each user can track progress over time.
+
+Lumify updates the InterviewDNA profile after every interview, allowing users to track their interview progress and receive personalized recommendations.
 
 ## Authentication Flow
 
@@ -527,7 +553,7 @@ Lumify/
 9. Generate the Interview Intelligence Report.
 10. Show match score, strengths, missing skills, answer feedback, and learning recommendations.
 
-## Milestone 3 Roadmap
+## Milestone 3+ Future Roadmap
 
 Planned after Milestone 2:
 

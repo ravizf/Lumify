@@ -1,7 +1,8 @@
 # Agent Workflow
 
-InterviewDNA uses an adaptive multi-agent design. The agents are not just
-calling an LLM; they coordinate, evaluate, remember, and adapt future sessions.
+Lumify uses a Milestone 2 agent workflow for resume analysis, job description
+analysis, competency gap detection, question generation, answer evaluation, and
+InterviewDNA profile updates.
 
 ## MVP Agent Flow
 
@@ -19,28 +20,21 @@ flowchart TD
   H --> I[Question Generator Agent]
   I --> J[Interview Session]
   J --> K[Text Answer]
-  J --> L[Audio Answer]
-  J --> M[Video Answer]
   K --> N[Text Analyzer]
-  L --> O[Speech Analyzer]
-  M --> P[Video Analyzer]
-  N --> Q[Multimodal Evaluation Engine]
-  O --> Q
-  P --> Q
+  N --> Q[AI Answer Evaluation]
   Q --> R[Feedback and Scoring Agent]
-  R --> S[InterviewDNA MVP Memory]
+  R --> S[InterviewDNA Profile]
   R --> T[Learning Planner]
   S --> U[Report Synthesizer Agent]
   T --> U
-  U --> V[Dashboard + Calendar + Next Steps]
+  U --> V[Interview Intelligence Report]
 ```
 
-## MVP Memory
+## InterviewDNA Module
 
-The MVP does not claim full continuous adaptation. It stores the current
-interview summary as InterviewDNA MVP memory so future interviews can use it.
-The production version will continuously update InterviewDNA after every
-interview and increase difficulty based on stored patterns.
+InterviewDNA is a module inside Lumify, not the product name. In Milestone 2,
+Lumify stores the current interview summary, strengths, gaps, feedback, and
+learning recommendations as part of the user's InterviewDNA profile.
 
 ## LangGraph Flow
 
@@ -55,7 +49,7 @@ flowchart TD
   F --> G
   G --> H[Conduct Interview]
   H --> I[Evaluate Answers]
-  I --> J[Update Memory]
+  I --> J[Update InterviewDNA Profile]
   J --> K[Generate Roadmap]
   K --> L[END]
 ```
@@ -72,26 +66,22 @@ flowchart TD
 | Adaptive Interview Planner | Chooses question strategy based on memory and gaps |
 | Question Generator Agent | Generates role-specific questions |
 | Text Analyzer | Evaluates text answers |
-| Speech Analyzer | Evaluates audio delivery signals |
-| Video Analyzer | Evaluates video presence signals |
-| Multimodal Evaluation Engine | Combines text, speech, and video signals |
 | Feedback and Scoring Agent | Produces scores and coaching feedback |
 | Learning Planner | Generates roadmap tasks |
 | Report Synthesizer Agent | Creates the Interview Intelligence Report |
-| Calendar Scheduler | Schedules the next practice session |
 | Progress Tracker | Updates readiness trends over time |
 
-## Memory Loop
+## Profile Loop
 
 ```text
 Interview 1
 -> Interview Intelligence Report
--> InterviewDNA Memory
+-> InterviewDNA Profile
 -> Interview 2 becomes more targeted
--> Memory updates again
--> Interview 3 adapts further
+-> Profile updates again
+-> Interview 3 can use prior progress
 ```
 
-The memory loop is the product's key differentiator. In the MVP, the current
-session summary is stored for demo reuse. In production, every session makes the
-candidate profile smarter.
+The InterviewDNA profile is Lumify's personalization layer. Future milestones
+can add richer adaptive behavior, speech analysis, video analysis, calendar
+integration, notifications, and long-term retrieval.

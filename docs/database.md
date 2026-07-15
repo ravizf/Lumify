@@ -1,9 +1,10 @@
 # Database Design
 
-InterviewDNA stores the candidate journey as an adaptive coaching loop. The
-schema supports resume parsing, target company/role context, competency
-intelligence, multimodal interview attempts, memory, feedback, roadmaps,
-calendar events, and notifications.
+Lumify stores the candidate journey for Milestone 2 interview preparation. The
+schema supports users, resumes, target roles, competency intelligence,
+interview sessions, text answer attempts, InterviewDNA profile data, feedback,
+and learning roadmaps. Some schema entities are reserved for Milestone 3+
+features.
 
 ```mermaid
 erDiagram
@@ -42,14 +43,17 @@ erDiagram
 | CompetencyScore | Gap score, evidence, and recommendation |
 | Assessment | Adaptive evaluation plan for a resume and target role |
 | Question | Generated interview or assessment question |
-| QuestionAttempt | Text, audio, or video answer plus score and feedback |
+| QuestionAttempt | Candidate answer plus score and feedback |
 | Hint | Contextual help for a question |
 | InterviewSession | Live or scheduled mock interview |
 | InterviewFeedback | Interview Intelligence Report data |
-| InterviewDnaMemory | Persistent learning memory across sessions |
+| InterviewDnaMemory | InterviewDNA profile data for personalized progress tracking |
 | LearningRoadmap | Personalized preparation plan |
 | RoadmapTask | Specific task tied to a competency gap |
 | CalendarEvent | Scheduled practice or interview event |
 | Notification | Candidate reminder or product update |
 
 The implementation lives in `core-api/prisma/schema.prisma`.
+
+Calendar events, notifications, audio attempts, and video attempts are planned
+for Milestone 3+ and are not part of the current Milestone 2 demo workflow.

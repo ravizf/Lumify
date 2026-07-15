@@ -1,20 +1,17 @@
 # Architecture
 
-InterviewDNA is a production-style monorepo with a React frontend, an Express
-Core API, a FastAPI Agent Engine, Redis for fast coordination, and PostgreSQL
-with pgvector for relational and retrieval storage.
+Lumify is a Milestone 2 monorepo with a React frontend, an Express Core API, a
+FastAPI Agent Engine, LangGraph workflow orchestration, Gemini AI integration,
+and PostgreSQL persistence through Prisma.
 
 ```mermaid
 flowchart TD
-  A[React Frontend] -->|HTTPS| B[NGINX Gateway]
-  B --> C[Core API<br/>Express]
-  C --> D[Redis<br/>sessions, rate limits, queues, AI cache]
-  D --> E[Agent Engine<br/>FastAPI]
-  E --> F[LangGraph]
-  F --> G[Gemini API]
-  C --> H[PostgreSQL + Prisma]
-  H --> I[pgvector]
-  E --> H
+  A[React Frontend] --> B[Core API<br/>Express]
+  B --> C[PostgreSQL<br/>Prisma]
+  B --> D[Agent Engine<br/>FastAPI]
+  D --> E[LangGraph]
+  E --> F[Gemini AI]
+  D --> B
 ```
 
 ## Service Responsibilities
@@ -22,38 +19,33 @@ flowchart TD
 | Service | Responsibility |
 | --- | --- |
 | Frontend | Candidate journey, resume upload, company selection, interview flow, roadmap, progress dashboard |
-| Core API | Auth, users, resumes, roles, assessments, attempts, roadmaps, calendars, notifications, persistence |
-| Redis | Session cache, rate limiting, async job queue, AI-response cache, interview state handoff |
+| Core API | Auth, users, resumes, protected interview routes, answer evaluation, persistence |
 | Agent Engine | Multi-agent orchestration, LangGraph nodes, memory updates, question planning, evaluation, roadmap generation |
-| NGINX Gateway | TLS termination, routing, reverse proxy, service isolation |
-| PostgreSQL + pgvector | System of record plus vector search over resume evidence, feedback, and learning resources |
+| PostgreSQL + Prisma | System of record for users, resumes, interview sessions, questions, and learning roadmap rows |
 
 ## Deployment Story
 
 ```mermaid
 flowchart TD
   A[Frontend] --> B[Vercel]
-  B --> C[NGINX Gateway]
-  C --> D[Render: Core API]
-  D --> E[Redis]
-  D --> F[Render: Agent Engine]
-  F --> G[Gemini API]
-  D --> H[Managed PostgreSQL]
-  H --> I[pgvector]
+  B --> C[Render: Core API]
+  C --> D[Render: Agent Engine]
+  D --> E[Gemini AI]
+  C --> F[Managed PostgreSQL]
 ```
 
-## Adaptive Intelligence Loop
+## InterviewDNA Module
 
-InterviewDNA does not stop after a report. Each session updates
-`InterviewDnaMemory`, which helps the next interview become more targeted and
-appropriately difficult.
+Lumify includes InterviewDNA as a personalized interview profile module. Each
+interview can update the user's InterviewDNA profile with summaries, feedback,
+competency gaps, strengths, and learning recommendations.
 
 ```text
 Upload Resume + Target JD
 -> Competency Intelligence Engine
 -> Adaptive Interview Planner
--> Multimodal Evaluation Engine
--> InterviewDNA Memory Update
+-> AI Answer Evaluation
+-> InterviewDNA Profile Update
 -> Personalized Learning Roadmap
--> Calendar + Next Practice
+-> Interview Intelligence Report
 ```
